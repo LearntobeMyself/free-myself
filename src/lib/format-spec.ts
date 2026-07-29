@@ -5,6 +5,7 @@ export const StyleRoleSchema = z.enum([
   "heading1",
   "heading2",
   "heading3",
+  "heading4",
   "body",
   "quote",
   "code",
@@ -22,6 +23,7 @@ export const StyleDefSchema = z.object({
   fontSizePt: z.number().positive().default(12),
   bold: z.boolean().default(false),
   italic: z.boolean().default(false),
+  color: z.string().default("#000000"),
   align: z.enum(["left", "center", "right", "both"]).default("both"),
   lineSpacing: z.number().positive().default(1.5),
   spaceBeforePt: z.number().min(0).default(0),
@@ -32,6 +34,52 @@ export const StyleDefSchema = z.object({
 });
 
 export type StyleDef = z.infer<typeof StyleDefSchema>;
+
+export const MatchRuleSchema = z.object({
+  role: StyleRoleSchema,
+  pattern: z.string().min(1),
+  flags: z.string().optional(),
+});
+
+export type MatchRule = z.infer<typeof MatchRuleSchema>;
+
+export const TableSpecSchema = z.object({
+  headerBold: z.boolean().default(true),
+  headerFontEastAsia: z.string().default("黑体"),
+  headerFontSizePt: z.number().positive().default(12),
+  headerColor: z.string().default("#000000"),
+  headerShading: z.string().default(""),
+  bodyFontEastAsia: z.string().default("宋体"),
+  bodyFontSizePt: z.number().positive().default(10.5),
+  bodyColor: z.string().default("#000000"),
+  borders: z.boolean().default(true),
+  align: z.enum(["left", "center", "right", "both"]).default("center"),
+});
+
+export type TableSpec = z.infer<typeof TableSpecSchema>;
+
+export const DEFAULT_MATCH_RULES: MatchRule[] = [
+  { role: "heading1", pattern: "^第.+[章节部]" },
+  { role: "heading2", pattern: "^[一二三四五六七八九十]+[、.．]" },
+  { role: "heading2", pattern: "^\\d+[、.](?!\\d)" },
+  { role: "heading4", pattern: "^\\d+\\.\\d+\\.\\d+" },
+  { role: "heading3", pattern: "^\\d+\\.\\d+(?!\\.\\d)" },
+  { role: "heading3", pattern: "^[（(][一二三四五六七八九十\\d]+[）)]" },
+  { role: "bibliography", pattern: "^参考文献" },
+];
+
+export const DEFAULT_TABLE_SPEC: TableSpec = {
+  headerBold: true,
+  headerFontEastAsia: "黑体",
+  headerFontSizePt: 12,
+  headerColor: "#000000",
+  headerShading: "D9D9D9",
+  bodyFontEastAsia: "宋体",
+  bodyFontSizePt: 10.5,
+  bodyColor: "#000000",
+  borders: true,
+  align: "center",
+};
 
 export const FormatSpecSchema = z.object({
   id: z.string().optional(),
@@ -60,6 +108,7 @@ export const FormatSpecSchema = z.object({
       h1: StyleRoleSchema.default("heading1"),
       h2: StyleRoleSchema.default("heading2"),
       h3: StyleRoleSchema.default("heading3"),
+      h4: StyleRoleSchema.default("heading4"),
       paragraph: StyleRoleSchema.default("body"),
       blockquote: StyleRoleSchema.default("quote"),
       code: StyleRoleSchema.default("code"),
@@ -68,14 +117,21 @@ export const FormatSpecSchema = z.object({
       h1: "heading1",
       h2: "heading2",
       h3: "heading3",
+      h4: "heading4",
       paragraph: "body",
       blockquote: "quote",
       code: "code",
     }),
+  table: TableSpecSchema.default(DEFAULT_TABLE_SPEC),
+  matchRules: z.array(MatchRuleSchema).default(DEFAULT_MATCH_RULES),
   warnings: z.array(z.string()).default([]),
 });
 
 export type FormatSpec = z.infer<typeof FormatSpecSchema>;
+
+function withBlack(s: Record<string, unknown>): StyleDef {
+  return StyleDefSchema.parse({ color: "#000000", ...s });
+}
 
 export function defaultCourseReportSpec(name = "课程报告规范"): FormatSpec {
   return FormatSpecSchema.parse({
@@ -86,7 +142,7 @@ export function defaultCourseReportSpec(name = "课程报告规范"): FormatSpec
       marginCm: { top: 2.54, bottom: 2.54, left: 3.17, right: 3.17 },
     },
     styles: [
-      {
+      withBlack({
         role: "title",
         fontEastAsia: "黑体",
         fontAscii: "Times New Roman",
@@ -95,8 +151,8 @@ export function defaultCourseReportSpec(name = "课程报告规范"): FormatSpec
         align: "center",
         lineSpacing: 1.5,
         firstLineIndentChars: 0,
-      },
-      {
+      }),
+      withBlack({
         role: "heading1",
         fontEastAsia: "黑体",
         fontAscii: "Times New Roman",
@@ -107,8 +163,8 @@ export function defaultCourseReportSpec(name = "课程报告规范"): FormatSpec
         spaceBeforePt: 12,
         spaceAfterPt: 6,
         outlineLevel: 1,
-      },
-      {
+      }),
+      withBlack({
         role: "heading2",
         fontEastAsia: "黑体",
         fontAscii: "Times New Roman",
@@ -119,8 +175,8 @@ export function defaultCourseReportSpec(name = "课程报告规范"): FormatSpec
         spaceBeforePt: 8,
         spaceAfterPt: 4,
         outlineLevel: 2,
-      },
-      {
+      }),
+      withBlack({
         role: "heading3",
         fontEastAsia: "楷体",
         fontAscii: "Times New Roman",
@@ -129,8 +185,18 @@ export function defaultCourseReportSpec(name = "课程报告规范"): FormatSpec
         align: "left",
         lineSpacing: 1.5,
         outlineLevel: 3,
-      },
-      {
+      }),
+      withBlack({
+        role: "heading4",
+        fontEastAsia: "宋体",
+        fontAscii: "Times New Roman",
+        fontSizePt: 12,
+        bold: true,
+        align: "left",
+        lineSpacing: 1.5,
+        outlineLevel: 4,
+      }),
+      withBlack({
         role: "body",
         fontEastAsia: "宋体",
         fontAscii: "Times New Roman",
@@ -138,8 +204,8 @@ export function defaultCourseReportSpec(name = "课程报告规范"): FormatSpec
         align: "both",
         lineSpacing: 1.5,
         firstLineIndentChars: 2,
-      },
-      {
+      }),
+      withBlack({
         role: "quote",
         fontEastAsia: "楷体",
         fontAscii: "Times New Roman",
@@ -148,16 +214,16 @@ export function defaultCourseReportSpec(name = "课程报告规范"): FormatSpec
         align: "both",
         lineSpacing: 1.5,
         firstLineIndentChars: 2,
-      },
-      {
+      }),
+      withBlack({
         role: "code",
         fontEastAsia: "宋体",
         fontAscii: "Consolas",
         fontSizePt: 10,
         align: "left",
         lineSpacing: 1.15,
-      },
-      {
+      }),
+      withBlack({
         role: "bibliography",
         fontEastAsia: "宋体",
         fontAscii: "Times New Roman",
@@ -165,25 +231,38 @@ export function defaultCourseReportSpec(name = "课程报告规范"): FormatSpec
         align: "both",
         lineSpacing: 1.5,
         hangingIndentChars: 2,
-      },
-      {
+      }),
+      withBlack({
         role: "caption",
         fontEastAsia: "宋体",
         fontAscii: "Times New Roman",
         fontSizePt: 10.5,
         align: "center",
         lineSpacing: 1.5,
-      },
-      {
+      }),
+      withBlack({
         role: "footer",
         fontEastAsia: "宋体",
         fontAscii: "Times New Roman",
         fontSizePt: 9,
         align: "center",
         lineSpacing: 1,
-      },
+      }),
     ],
     numbering: { enabled: false },
+    table: {
+      headerBold: true,
+      headerFontEastAsia: "黑体",
+      headerFontSizePt: 12,
+      headerColor: "#000000",
+      headerShading: "D9D9D9",
+      bodyFontEastAsia: "宋体",
+      bodyFontSizePt: 10.5,
+      bodyColor: "#000000",
+      borders: true,
+      align: "center",
+    },
+    matchRules: DEFAULT_MATCH_RULES,
     warnings: [
       "v1 不保证复杂页眉域、浮动图文框、修订痕迹",
       "目录域与公式需后续迭代",
@@ -233,9 +312,7 @@ export function ingestSpecFromNaturalLanguage(text: string, name?: string): Form
     const b = Number(margin[2]);
     base.meta.marginCm = { top: a, bottom: a, left: b, right: b };
   }
-  const margin4 = lower.match(
-    /上下\s*([0-9.]+).*?左右\s*([0-9.]+)/,
-  );
+  const margin4 = lower.match(/上下\s*([0-9.]+).*?左右\s*([0-9.]+)/);
   if (margin4) {
     const tb = Number(margin4[1]);
     const lr = Number(margin4[2]);
@@ -253,6 +330,7 @@ export function ingestSpecFromNaturalLanguage(text: string, name?: string): Form
     base.styles[idx] = {
       ...cur,
       ...defaults,
+      color: "#000000",
       fontSizePt: chunk ? pickSize(chunk, cur.fontSizePt) : cur.fontSizePt,
       align: chunk ? pickAlign(chunk) : cur.align,
       bold: chunk.includes("加粗") || chunk.includes("黑体") ? true : cur.bold,
@@ -291,25 +369,31 @@ export function normalizeSpec(input: unknown): FormatSpec {
   const parsed = FormatSpecSchema.parse(input);
   const roles = new Set(parsed.styles.map((s) => s.role));
   if (!roles.has("body")) {
-    parsed.styles.push({
-      role: "body",
-      fontEastAsia: "宋体",
-      fontAscii: "Times New Roman",
-      fontSizePt: 12,
-      bold: false,
-      italic: false,
-      align: "both",
-      lineSpacing: 1.5,
-      spaceBeforePt: 0,
-      spaceAfterPt: 0,
-      firstLineIndentChars: 2,
-      hangingIndentChars: 0,
-    });
+    parsed.styles.push(
+      withBlack({
+        role: "body",
+        fontEastAsia: "宋体",
+        fontAscii: "Times New Roman",
+        fontSizePt: 12,
+        bold: false,
+        italic: false,
+        align: "both",
+        lineSpacing: 1.5,
+        spaceBeforePt: 0,
+        spaceAfterPt: 0,
+        firstLineIndentChars: 2,
+        hangingIndentChars: 0,
+      }),
+    );
   }
-  // Deduplicate by role (last wins)
   const map = new Map<StyleRole, StyleDef>();
-  for (const s of parsed.styles) map.set(s.role, s);
+  for (const s of parsed.styles) {
+    map.set(s.role, { ...s, color: s.color || "#000000" });
+  }
   parsed.styles = [...map.values()];
+  if (!parsed.matchRules?.length) {
+    parsed.matchRules = [...DEFAULT_MATCH_RULES];
+  }
   return parsed;
 }
 
@@ -351,6 +435,8 @@ export function roleToWordStyleName(role: StyleRole): string {
       return "Heading 2";
     case "heading3":
       return "Heading 3";
+    case "heading4":
+      return "Heading 4";
     case "quote":
       return "Quote";
     case "code":
@@ -364,4 +450,14 @@ export function roleToWordStyleName(role: StyleRole): string {
     default:
       return "Normal";
   }
+}
+
+/** Convert simple wildcards (第*章) to RegExp source; pass through real regex. */
+export function patternToRegExpSource(pattern: string): string {
+  const p = pattern.trim();
+  if (!p) return "^$";
+  if (p.startsWith("^") || p.includes("\\") || /[[\]()+?{}|]/.test(p)) {
+    return p;
+  }
+  return `^${p.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*")}`;
 }

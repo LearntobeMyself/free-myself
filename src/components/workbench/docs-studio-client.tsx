@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useRef, useState, type DragEvent } from "react";
-import type { FormatSpec, StyleRole } from "@/lib/format-spec";
+import type { FormatSpec, MatchRule, StyleRole } from "@/lib/format-spec";
 import {
+  COLOR_PRESETS,
   EDIT_ROLES,
   FONT_ASCII,
   FONT_EAST,
@@ -10,6 +11,8 @@ import {
   cssFromStyle,
   patchMargins,
   patchRole,
+  patchTable,
+  setMatchRules,
   styleOf,
   visibleCourseReportSpec,
 } from "@/lib/style-editor";
@@ -43,16 +46,31 @@ function isMarkdownFile(file: File): boolean {
   );
 }
 
-export function DocsStudioClient(_props: { initialSpecs: { id: string; name: string; scene: string }[] }) {
+const RULE_ROLES: StyleRole[] = [
+  "title",
+  "heading1",
+  "heading2",
+  "heading3",
+  "heading4",
+  "body",
+  "bibliography",
+];
+
+export function DocsStudioClient(_props: {
+  initialSpecs: { id: string; name: string; scene: string }[];
+}) {
   const [spec, setSpec] = useState<FormatSpec>(() => visibleCourseReportSpec());
   const [activeRole, setActiveRole] = useState<StyleRole>("body");
   const [tab, setTab] = useState<Tab>("word");
   const [docxFile, setDocxFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [rulesOpen, setRulesOpen] = useState(false);
   const [markdown, setMarkdown] = useState(
-    "# 人工智能导论\n\n## 背景\n\n本节讨论大模型与文档排版。学校要求黑体标题、宋体正文。\n\n## 结论\n\n按自己的规范改格式，比套漂亮模板靠谱。",
+    "# 人工智能导论\n\n## 背景\n\n本节讨论大模型与文档排版。\n\n### 方法\n\n#### 细节\n\n正文段落。",
   );
-  const [status, setStatus] = useState("调左侧样式，右侧会马上变。改完再上传文件下载。");
+  const [status, setStatus] = useState(
+    "任意 .docx 都可上传。用匹配规则告诉系统什么是标题；标题默认黑色。",
+  );
   const [busy, setBusy] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
@@ -63,6 +81,8 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
   const titleCss = useMemo(() => cssFromStyle(styleOf(spec, "title")), [spec]);
   const h1Css = useMemo(() => cssFromStyle(styleOf(spec, "heading1")), [spec]);
   const h2Css = useMemo(() => cssFromStyle(styleOf(spec, "heading2")), [spec]);
+  const h3Css = useMemo(() => cssFromStyle(styleOf(spec, "heading3")), [spec]);
+  const h4Css = useMemo(() => cssFromStyle(styleOf(spec, "heading4")), [spec]);
   const bodyCss = useMemo(() => cssFromStyle(styleOf(spec, "body")), [spec]);
 
   const paperPad = {
@@ -76,6 +96,23 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
     setSpec((s) => patchRole(s, activeRole, patch));
   }
 
+  function updateRule(index: number, patch: Partial<MatchRule>) {
+    setSpec((s) => {
+      const rules = s.matchRules.map((r, i) => (i === index ? { ...r, ...patch } : r));
+      return setMatchRules(s, rules);
+    });
+  }
+
+  function addRule() {
+    setSpec((s) =>
+      setMatchRules(s, [...s.matchRules, { role: "heading1", pattern: "^第.+章" }]),
+    );
+  }
+
+  function removeRule(index: number) {
+    setSpec((s) => setMatchRules(s, s.matchRules.filter((_, i) => i !== index)));
+  }
+
   function pickDocx(file: File | null) {
     if (!file) return;
     if (!isDocx(file)) {
@@ -83,7 +120,7 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
       return;
     }
     setDocxFile(file);
-    setStatus(`已选：${file.name}`);
+    setStatus(`已选：${file.name}（任意稿件均可）`);
   }
 
   async function pickMarkdown(file: File | null) {
@@ -102,19 +139,13 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
     pickDocx(e.dataTransfer.files?.[0] ?? null);
   }
 
-  function onMdDrop(e: DragEvent) {
-    e.preventDefault();
-    setDragOver(false);
-    void pickMarkdown(e.dataTransfer.files?.[0] ?? null);
-  }
-
   async function formatWord() {
     if (!docxFile) {
-      setStatus("请先上传 .docx");
+      setStatus("请先上传任意 .docx");
       return;
     }
     setBusy(true);
-    setStatus("正在按当前样式改格式…");
+    setStatus("正在按当前样式与匹配规则改格式…");
     setDownloadUrl(null);
     try {
       const form = new FormData();
@@ -129,9 +160,14 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
       if (data.docxBase64) {
         setDownloadUrl(base64ToObjectUrl(data.docxBase64));
         const s = data.summary;
+        const roles = s?.rolesUsed
+          ? Object.entries(s.rolesUsed)
+              .map(([k, v]) => `${ROLE_LABELS[k] ?? k}:${v}`)
+              .join(" · ")
+          : "";
         setStatus(
           s
-            ? `已改 ${s.paragraphsStyled ?? "?"} 段 · 正文 ${s.bodyFont ?? ""} ${s.bodySizePt ?? ""}pt · 可下载`
+            ? `已改 ${s.paragraphsStyled ?? "?"} 处 · 字色 ${s.forcedColor ?? "#000"} · ${roles}`
             : "改好了，可以下载",
         );
       } else {
@@ -156,11 +192,7 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
       const res = await fetch("/api/docs/convert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          direction: "md_to_docx",
-          markdown,
-          spec,
-        }),
+        body: JSON.stringify({ direction: "md_to_docx", markdown, spec }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -169,12 +201,7 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
       }
       if (data.docxBase64) {
         setDownloadUrl(base64ToObjectUrl(data.docxBase64));
-        const s = data.summary;
-        setStatus(
-          s
-            ? `已生成 ${s.paragraphsStyled ?? "?"} 段 · 可下载`
-            : "转好了，可以下载",
-        );
+        setStatus(`已生成 ${data.summary?.paragraphsStyled ?? "?"} 段 · 可下载`);
       } else {
         setStatus("服务没有返回文件");
       }
@@ -191,7 +218,7 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
         <div>
           <h1 className="fm-workbench-title">文档工坊</h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
-            左边调样式，右边立刻预览；确认后再套到你的 Word / Markdown。
+            上传任意 Word；用匹配规则识别标题；样式含 H4 / 表格；标题默认黑色（不再用主题蓝）。
           </p>
         </div>
         <button
@@ -199,15 +226,14 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
           className="fm-btn"
           onClick={() => {
             setSpec(visibleCourseReportSpec());
-            setStatus("已载入课程报告预设，可继续微调");
+            setStatus("已重置为课程报告预设（黑色字色）");
           }}
         >
-          重置为课程报告预设
+          重置预设
         </button>
       </header>
 
       <div className="fm-docs-split">
-        {/* 左：控件 */}
         <div className="fm-docs-editor">
           <div className="fm-docs-role-tabs">
             {EDIT_ROLES.map((role) => (
@@ -264,6 +290,30 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
               />
             </label>
             <label className="fm-docs-knob">
+              <span>文字颜色</span>
+              <div className="flex items-center gap-2">
+                <input
+                  className="h-9 w-12 cursor-pointer rounded border border-[var(--border)]"
+                  type="color"
+                  value={current.color || "#000000"}
+                  onChange={(e) => updateCurrent({ color: e.target.value })}
+                />
+                <select
+                  className="fm-select"
+                  value={COLOR_PRESETS.includes(current.color as (typeof COLOR_PRESETS)[number])
+                    ? current.color
+                    : current.color || "#000000"}
+                  onChange={(e) => updateCurrent({ color: e.target.value })}
+                >
+                  {COLOR_PRESETS.map((c) => (
+                    <option key={c} value={c}>
+                      {c === "#000000" ? "黑色" : c === "#333333" ? "深灰" : "深红"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </label>
+            <label className="fm-docs-knob">
               <span>行距</span>
               <input
                 className="fm-input"
@@ -293,7 +343,7 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
               </select>
             </label>
             <label className="fm-docs-knob">
-              <span>首行缩进（字符）</span>
+              <span>首行缩进</span>
               <input
                 className="fm-input"
                 type="number"
@@ -313,14 +363,6 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
                 onChange={(e) => updateCurrent({ bold: e.target.checked })}
               />
               <span>加粗</span>
-            </label>
-            <label className="fm-docs-knob fm-docs-knob-check">
-              <input
-                type="checkbox"
-                checked={current.italic}
-                onChange={(e) => updateCurrent({ italic: e.target.checked })}
-              />
-              <span>斜体</span>
             </label>
           </div>
 
@@ -355,10 +397,151 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
             </div>
           </div>
 
+          <div className="fm-docs-margins">
+            <p className="fm-section-label mb-2">表格样式</p>
+            <div className="fm-docs-knobs">
+              <label className="fm-docs-knob">
+                <span>表头字体</span>
+                <select
+                  className="fm-select"
+                  value={spec.table.headerFontEastAsia}
+                  onChange={(e) =>
+                    setSpec((s) => patchTable(s, { headerFontEastAsia: e.target.value }))
+                  }
+                >
+                  {FONT_EAST.map((f) => (
+                    <option key={f} value={f}>
+                      {f}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="fm-docs-knob">
+                <span>表头字号</span>
+                <input
+                  className="fm-input"
+                  type="number"
+                  min={8}
+                  max={24}
+                  value={spec.table.headerFontSizePt}
+                  onChange={(e) =>
+                    setSpec((s) =>
+                      patchTable(s, { headerFontSizePt: Number(e.target.value) || 12 }),
+                    )
+                  }
+                />
+              </label>
+              <label className="fm-docs-knob">
+                <span>单元格字体</span>
+                <select
+                  className="fm-select"
+                  value={spec.table.bodyFontEastAsia}
+                  onChange={(e) =>
+                    setSpec((s) => patchTable(s, { bodyFontEastAsia: e.target.value }))
+                  }
+                >
+                  {FONT_EAST.map((f) => (
+                    <option key={f} value={f}>
+                      {f}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="fm-docs-knob">
+                <span>单元格字号</span>
+                <input
+                  className="fm-input"
+                  type="number"
+                  min={8}
+                  max={24}
+                  step={0.5}
+                  value={spec.table.bodyFontSizePt}
+                  onChange={(e) =>
+                    setSpec((s) =>
+                      patchTable(s, { bodyFontSizePt: Number(e.target.value) || 10.5 }),
+                    )
+                  }
+                />
+              </label>
+              <label className="fm-docs-knob fm-docs-knob-check">
+                <input
+                  type="checkbox"
+                  checked={spec.table.headerBold}
+                  onChange={(e) =>
+                    setSpec((s) => patchTable(s, { headerBold: e.target.checked }))
+                  }
+                />
+                <span>表头加粗</span>
+              </label>
+              <label className="fm-docs-knob fm-docs-knob-check">
+                <input
+                  type="checkbox"
+                  checked={spec.table.borders}
+                  onChange={(e) =>
+                    setSpec((s) => patchTable(s, { borders: e.target.checked }))
+                  }
+                />
+                <span>显示边框</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="fm-docs-margins">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="fm-section-label mb-0">标题匹配规则</p>
+              <button
+                type="button"
+                className="fm-btn"
+                onClick={() => setRulesOpen((v) => !v)}
+              >
+                {rulesOpen ? "收起" : "编辑规则"}
+              </button>
+            </div>
+            {rulesOpen ? (
+              <div className="space-y-2">
+                <p className="text-xs text-[var(--text-faint)]">
+                  支持通配如 <code>第*章</code>，或正则如 <code>^第.+章</code>。从上到下匹配。
+                </p>
+                {spec.matchRules.map((rule, i) => (
+                  <div key={i} className="flex flex-wrap items-center gap-2">
+                    <select
+                      className="fm-select max-w-[8rem]"
+                      value={rule.role}
+                      onChange={(e) =>
+                        updateRule(i, { role: e.target.value as StyleRole })
+                      }
+                    >
+                      {RULE_ROLES.map((r) => (
+                        <option key={r} value={r}>
+                          {ROLE_LABELS[r] ?? r}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      className="fm-input min-w-[12rem] flex-1"
+                      value={rule.pattern}
+                      onChange={(e) => updateRule(i, { pattern: e.target.value })}
+                      placeholder="匹配模式"
+                    />
+                    <button type="button" className="fm-btn" onClick={() => removeRule(i)}>
+                      删
+                    </button>
+                  </div>
+                ))}
+                <button type="button" className="fm-btn" onClick={addRule}>
+                  加一条规则
+                </button>
+              </div>
+            ) : (
+              <p className="text-xs text-[var(--text-faint)]">
+                已启用 {spec.matchRules.length} 条（如「第…章」→ H1）。点编辑可改成你文章的格式。
+              </p>
+            )}
+          </div>
+
           <div className="fm-docs-tabs" role="tablist">
             <button
               type="button"
-              role="tab"
               className={`fm-docs-tab ${tab === "word" ? "is-active" : ""}`}
               onClick={() => setTab("word")}
             >
@@ -366,7 +549,6 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
             </button>
             <button
               type="button"
-              role="tab"
               className={`fm-docs-tab ${tab === "markdown" ? "is-active" : ""}`}
               onClick={() => setTab("markdown")}
             >
@@ -389,23 +571,15 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
               />
               <div
                 className={`fm-dropzone ${dragOver ? "is-dragover" : ""}`}
-                onDragEnter={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
                 onDragOver={(e) => {
                   e.preventDefault();
                   setDragOver(true);
                 }}
-                onDragLeave={(e) => {
-                  e.preventDefault();
-                  if (e.currentTarget.contains(e.relatedTarget as Node)) return;
-                  setDragOver(false);
-                }}
+                onDragLeave={() => setDragOver(false)}
                 onDrop={onDocxDrop}
               >
                 <p className="fm-dropzone-title">
-                  {docxFile ? docxFile.name : "把 .docx 拖到这里"}
+                  {docxFile ? docxFile.name : "拖入任意 .docx"}
                 </p>
                 <button
                   type="button"
@@ -421,7 +595,7 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
                 disabled={busy}
                 onClick={() => void formatWord()}
               >
-                应用当前样式并下载
+                应用并下载
               </button>
             </section>
           ) : (
@@ -437,23 +611,9 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
                   e.target.value = "";
                 }}
               />
-              <div
-                className={`fm-dropzone fm-dropzone-compact ${dragOver ? "is-dragover" : ""}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={onMdDrop}
-              >
-                <button
-                  type="button"
-                  className="fm-btn"
-                  onClick={() => mdFileRef.current?.click()}
-                >
-                  选择 .md
-                </button>
-              </div>
+              <button type="button" className="fm-btn" onClick={() => mdFileRef.current?.click()}>
+                选择 .md
+              </button>
               <textarea
                 className="fm-textarea fm-docs-md-textarea"
                 value={markdown}
@@ -480,19 +640,84 @@ export function DocsStudioClient(_props: { initialSpecs: { id: string; name: str
           </div>
         </div>
 
-        {/* 右：预览 */}
         <aside className="fm-docs-preview-pane" aria-label="样式预览">
           <p className="fm-section-label mb-3">即时预览</p>
           <div className="fm-docs-paper" style={paperPad}>
             <p style={titleCss}>人工智能导论课程报告</p>
             <p style={h1Css}>第一章 背景</p>
             <p style={h2Css}>一、研究问题</p>
+            <p style={h3Css}>（一）方法说明</p>
+            <p style={h4Css}>1.1.1 细节标题</p>
             <p style={bodyCss}>
-              本节讨论大模型与文档排版。你在左边改字体、字号、行距和对齐，这里会马上跟着变；确认后再套到上传的稿件。
+              左边改字体、颜色、行距，这里马上变。标题默认黑色。上传你自己的稿即可，不限测试文件。
             </p>
-            <p style={bodyCss}>
-              页边距也会反映在这张「纸」的内边距上。想看明显差异，可把正文字号调到 16，中文字体改成楷体。
-            </p>
+            <table
+              className="fm-docs-preview-table"
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: "0.75rem",
+                fontSize: `${spec.table.bodyFontSizePt}pt`,
+                fontFamily: `"${spec.table.bodyFontEastAsia}", serif`,
+                color: spec.table.bodyColor || "#000",
+                border: spec.table.borders ? "1px solid #000" : "none",
+              }}
+            >
+              <thead>
+                <tr>
+                  <th
+                    style={{
+                      fontFamily: `"${spec.table.headerFontEastAsia}", serif`,
+                      fontSize: `${spec.table.headerFontSizePt}pt`,
+                      fontWeight: spec.table.headerBold ? 700 : 400,
+                      color: spec.table.headerColor || "#000",
+                      background: spec.table.headerShading
+                        ? `#${spec.table.headerShading.replace("#", "")}`
+                        : undefined,
+                      border: spec.table.borders ? "1px solid #000" : "none",
+                      padding: "4px 6px",
+                    }}
+                  >
+                    表头 A
+                  </th>
+                  <th
+                    style={{
+                      fontFamily: `"${spec.table.headerFontEastAsia}", serif`,
+                      fontSize: `${spec.table.headerFontSizePt}pt`,
+                      fontWeight: spec.table.headerBold ? 700 : 400,
+                      color: spec.table.headerColor || "#000",
+                      background: spec.table.headerShading
+                        ? `#${spec.table.headerShading.replace("#", "")}`
+                        : undefined,
+                      border: spec.table.borders ? "1px solid #000" : "none",
+                      padding: "4px 6px",
+                    }}
+                  >
+                    表头 B
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td
+                    style={{
+                      border: spec.table.borders ? "1px solid #000" : "none",
+                      padding: "4px 6px",
+                    }}
+                  >
+                    内容 1
+                  </td>
+                  <td
+                    style={{
+                      border: spec.table.borders ? "1px solid #000" : "none",
+                      padding: "4px 6px",
+                    }}
+                  >
+                    内容 2
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </aside>
       </div>

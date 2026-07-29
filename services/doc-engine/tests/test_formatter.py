@@ -1,15 +1,15 @@
-"""Tests for forced visible formatting."""
+"""Tests: black color, match rules, tables."""
 
 from __future__ import annotations
 
 import io
 
 from docx import Document
-from docx.shared import Pt
+from docx.oxml.ns import qn
+from docx.shared import Pt, RGBColor
 
-from formatter import format_existing_docx, markdown_to_docx
+from formatter import format_existing_docx, guess_role, markdown_to_docx
 
-# Deliberately exaggerated so tests catch "no-op" formatting.
 LOUD_SPEC = {
     "meta": {
         "name": "夸张测试规范",
@@ -24,6 +24,7 @@ LOUD_SPEC = {
             "fontAscii": "Arial",
             "fontSizePt": 22,
             "bold": True,
+            "color": "#000000",
             "align": "center",
             "lineSpacing": 1.5,
             "firstLineIndentChars": 0,
@@ -34,6 +35,7 @@ LOUD_SPEC = {
             "fontAscii": "Arial",
             "fontSizePt": 18,
             "bold": True,
+            "color": "#000000",
             "align": "left",
             "lineSpacing": 1.5,
         },
@@ -43,15 +45,33 @@ LOUD_SPEC = {
             "fontAscii": "Arial",
             "fontSizePt": 18,
             "bold": False,
+            "color": "#000000",
             "align": "both",
             "lineSpacing": 2.0,
             "firstLineIndentChars": 2,
         },
     ],
+    "matchRules": [
+        {"role": "heading1", "pattern": "^第.+章"},
+        {"role": "heading2", "pattern": "^[一二三四五六七八九十]+、"},
+    ],
+    "table": {
+        "headerBold": True,
+        "headerFontEastAsia": "黑体",
+        "headerFontSizePt": 12,
+        "headerColor": "#000000",
+        "headerShading": "D9D9D9",
+        "bodyFontEastAsia": "宋体",
+        "bodyFontSizePt": 10.5,
+        "bodyColor": "#000000",
+        "borders": True,
+        "align": "center",
+    },
     "mdMapping": {
         "h1": "heading1",
         "h2": "heading2",
         "h3": "heading3",
+        "h4": "heading4",
         "paragraph": "body",
         "blockquote": "quote",
         "code": "code",
@@ -64,27 +84,49 @@ def _sample_docx_bytes() -> bytes:
     doc.add_paragraph("人工智能导论课程报告")
     doc.add_paragraph("第一章 背景")
     doc.add_paragraph("本节讨论大模型与文档排版。")
+    table = doc.add_table(rows=2, cols=2)
+    table.cell(0, 0).text = "表头A"
+    table.cell(0, 1).text = "表头B"
+    table.cell(1, 0).text = "内容1"
+    table.cell(1, 1).text = "内容2"
     buf = io.BytesIO()
     doc.save(buf)
     return buf.getvalue()
 
 
-def test_format_docx_loud_margins_and_fonts():
+def _run_color_val(run) -> str | None:
+    rPr = run._element.find(qn("w:rPr"))
+    if rPr is None:
+        return None
+    color = rPr.find(qn("w:color"))
+    if color is None:
+        return None
+    return color.get(qn("w:val"))
+
+
+def test_format_docx_black_and_roles():
     out, summary = format_existing_docx(_sample_docx_bytes(), LOUD_SPEC)
-    assert summary["paragraphsStyled"] >= 3
-    assert summary["bodySizePt"] == 18
+    assert summary["rolesUsed"].get("heading1", 0) >= 1
+    assert summary["forcedColor"] == "#000000"
+    assert summary["tableCellsStyled"] >= 2
 
     doc = Document(io.BytesIO(out))
-    section = doc.sections[0]
-    assert abs(section.left_margin.cm - 4.0) < 0.05
-
+    assert abs(doc.sections[0].left_margin.cm - 4.0) < 0.05
     paras = [p for p in doc.paragraphs if p.text.strip()]
-    assert paras[0].runs
     assert paras[0].runs[0].font.size == Pt(22)
-    assert paras[0].runs[0].font.bold is True
+    assert paras[0].runs[0].font.color.rgb == RGBColor(0, 0, 0)
+    assert _run_color_val(paras[0].runs[0]) == "000000"
 
-    body = paras[-1]
-    assert body.runs[0].font.size == Pt(18)
+    # Heading style must not leave theme blue
+    h1 = next(p for p in paras if "第一章" in p.text)
+    assert h1.runs[0].font.color.rgb == RGBColor(0, 0, 0)
+
+
+def test_match_rules_heading1():
+    doc = Document()
+    p = doc.add_paragraph("第一章 背景")
+    role = guess_role(p, p.text, 1, LOUD_SPEC["matchRules"])
+    assert role == "heading1"
 
 
 def test_md_to_docx_loud_body():
@@ -95,3 +137,4 @@ def test_md_to_docx_loud_body():
     assert abs(doc.sections[0].left_margin.cm - 4.0) < 0.05
     texts = [p.text for p in doc.paragraphs if p.text.strip()]
     assert "人工智能导论" in texts[0]
+    assert doc.paragraphs[0].runs[0].font.color.rgb == RGBColor(0, 0, 0)
