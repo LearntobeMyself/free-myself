@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --bg-0: #0e0f10;
-  --bg-1: #16181a;
-  --bg-2: #1e2124;
-  --bg-3: #272b30;
-  --border: rgba(255, 255, 255, 0.1);
-  --border-strong: rgba(255, 255, 255, 0.18);
-  --text: #e8eaed;
-  --text-muted: #9aa0a6;
-  --text-faint: #6b7280;
-  --accent: #c4a574;
-  --accent-soft: rgba(196, 165, 116, 0.14);
-  --ok: #6fbf8a;
-  --bad: #e07a6b;
-  --radius: 10px;
-  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC",
-    "Source Han Serif SC", serif;
-  --font-body: "IBM Plex Sans", "Segoe UI", "PingFang SC", "Microsoft YaHei",
+  --bg-0: #f6f7f8;
+  --bg-1: #ffffff;
+  --bg-2: #eef0f2;
+  --bg-3: #e4e7eb;
+  --border: rgba(20, 24, 28, 0.08);
+  --border-strong: rgba(20, 24, 28, 0.14);
+  --text: #14181c;
+  --text-muted: #5c6570;
+  --text-faint: #8a939e;
+  --accent: #1f5c57;
+  --accent-soft: rgba(31, 92, 87, 0.1);
+  --accent-hover: #184943;
+  --ok: #2f7d4a;
+  --bad: #b54a3c;
+  --radius: 12px;
+  --font-display: var(--font-display-loaded), "Songti SC", "Source Han Serif SC",
+    Georgia, serif;
+  --font-body: var(--font-body-loaded), "PingFang SC", "Microsoft YaHei",
     sans-serif;
-  --font-mono: "IBM Plex Mono", "Cascadia Code", Consolas, monospace;
+  --font-mono: var(--font-mono-loaded), "Cascadia Code", Consolas, monospace;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --shadow-soft: 0 1px 0 rgba(20, 24, 28, 0.04);
 }
 
 @theme inline {
@@ -42,12 +44,12 @@ body {
 body {
   margin: 0;
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(196, 165, 116, 0.08), transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, rgba(110, 140, 170, 0.08), transparent 50%),
-    linear-gradient(180deg, #121416 0%, var(--bg-0) 40%, #0b0c0d 100%);
+    radial-gradient(900px 420px at 50% -8%, rgba(31, 92, 87, 0.06), transparent 55%),
+    var(--bg-0);
   color: var(--text);
   font-family: var(--font-body);
-  line-height: 1.55;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -62,7 +64,8 @@ a {
 
 .fm-display {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  font-weight: 550;
 }
 
 .fm-mono {
@@ -73,6 +76,7 @@ a {
   background: var(--bg-1);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
 }
 
 .fm-btn {
@@ -80,41 +84,45 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.7rem 1.15rem;
-  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
   border: 1px solid var(--border-strong);
-  background: var(--bg-2);
+  background: var(--bg-1);
   color: var(--text);
-  font-size: 0.92rem;
-  transition: background 180ms var(--ease), border-color 180ms var(--ease),
-    transform 180ms var(--ease);
+  font-size: 0.94rem;
+  font-weight: 500;
+  transition:
+    background 200ms var(--ease),
+    border-color 200ms var(--ease),
+    transform 200ms var(--ease),
+    color 200ms var(--ease);
 }
 
 .fm-btn:hover {
-  background: var(--bg-3);
-  border-color: rgba(255, 255, 255, 0.28);
+  background: var(--bg-2);
+  border-color: rgba(20, 24, 28, 0.22);
 }
 
 .fm-btn-primary {
-  background: var(--accent);
-  color: #1a140c;
+  background: var(--text);
+  color: #f7f8f9;
   border-color: transparent;
-  font-weight: 600;
 }
 
 .fm-btn-primary:hover {
-  background: #d4b687;
+  background: #2a3138;
+  color: #fff;
 }
 
 .fm-input,
 .fm-textarea,
 .fm-select {
   width: 100%;
-  background: var(--bg-0);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: var(--bg-1);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
   color: var(--text);
-  padding: 0.7rem 0.85rem;
+  padding: 0.75rem 0.9rem;
   font: inherit;
 }
 
@@ -127,7 +135,7 @@ a {
 .fm-textarea:focus,
 .fm-select:focus {
   outline: 2px solid var(--accent-soft);
-  border-color: rgba(196, 165, 116, 0.45);
+  border-color: rgba(31, 92, 87, 0.45);
 }
 
 .fm-muted {
@@ -139,11 +147,11 @@ a {
 }
 
 .fm-fade-in {
-  animation: fmFade 560ms var(--ease) both;
+  animation: fmFade 640ms var(--ease) both;
 }
 
 .fm-rise {
-  animation: fmRise 700ms var(--ease) both;
+  animation: fmRise 780ms var(--ease) both;
 }
 
 @keyframes fmFade {
@@ -158,7 +166,7 @@ a {
 @keyframes fmRise {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
@@ -168,34 +176,36 @@ a {
 
 .fm-grid-projects {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 }
 
 .fm-nav {
   position: sticky;
   top: 0;
   z-index: 40;
-  backdrop-filter: blur(10px);
-  background: rgba(14, 15, 16, 0.72);
+  backdrop-filter: blur(14px);
+  background: rgba(246, 247, 248, 0.78);
   border-bottom: 1px solid var(--border);
 }
 
 .fm-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
   border: 1px solid var(--border);
-  font-size: 0.72rem;
+  background: var(--bg-2);
+  font-size: 0.7rem;
   color: var(--text-muted);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-weight: 500;
 }
 
 .fm-badge-wip {
   color: var(--accent);
-  border-color: rgba(196, 165, 116, 0.35);
+  border-color: rgba(31, 92, 87, 0.25);
   background: var(--accent-soft);
 }
 
@@ -205,4 +215,34 @@ a {
 
 .fm-badge-bad {
   color: var(--bad);
+}
+
+.fm-hero-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.fm-hero-prompt {
+  margin-top: 2.25rem;
+  max-width: 34rem;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-1);
+  border-radius: 18px;
+  padding: 1rem 1.15rem;
+  box-shadow: var(--shadow-soft);
+  color: var(--text-faint);
+  font-size: 0.95rem;
+}
+
+.fm-project-card {
+  transition:
+    transform 280ms var(--ease),
+    border-color 280ms var(--ease),
+    box-shadow 280ms var(--ease);
+}
+
+.fm-project-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(20, 24, 28, 0.16);
+  box-shadow: 0 12px 28px rgba(20, 24, 28, 0.06);
 }
