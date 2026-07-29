@@ -14,9 +14,23 @@ export class DocEngineError extends Error {
   }
 }
 
+export type FormatSummary = {
+  paragraphsStyled?: number;
+  rolesUsed?: Record<string, number>;
+  bodyFont?: string;
+  bodySizePt?: number;
+  marginCm?: Record<string, number>;
+};
+
+export type EngineDocResult = {
+  bytes: Uint8Array;
+  summary?: FormatSummary;
+};
+
 async function readErrorMessage(res: Response): Promise<string> {
   try {
-    const data = (await res.json()) as { detail?: string | { msg?: string }[] };
+    const data = (await res.json()) as { detail?: string | { msg?: string }[]; error?: string };
+    if (typeof data.error === "string") return data.error;
     if (typeof data.detail === "string") return data.detail;
     if (Array.isArray(data.detail)) {
       return data.detail.map((d) => d.msg ?? JSON.stringify(d)).join("; ");
@@ -30,14 +44,30 @@ async function readErrorMessage(res: Response): Promise<string> {
 function offlineHint(cause: unknown): string {
   const base = docEngineBaseUrl();
   const reason = cause instanceof Error ? cause.message : String(cause);
-  return `连不上排版服务（${base}）。请先在 services/doc-engine 启动：uvicorn main:app --host 127.0.0.1 --port 8765。详情：${reason}`;
+  return `连不上排版服务（${base}）。请先在 services/doc-engine 启动 uvicorn。详情：${reason}`;
 }
 
-/** Upload existing .docx + FormatSpec → formatted .docx bytes */
+function b64ToBytes(b64: string): Uint8Array {
+  return Uint8Array.from(Buffer.from(b64, "base64"));
+}
+
+async function parseEngineJson(res: Response): Promise<EngineDocResult> {
+  const data = (await res.json()) as {
+    docxBase64?: string;
+    summary?: FormatSummary;
+    detail?: string;
+  };
+  if (!data.docxBase64) {
+    throw new DocEngineError(data.detail ?? "排版服务未返回文件", 502);
+  }
+  return { bytes: b64ToBytes(data.docxBase64), summary: data.summary };
+}
+
+/** Upload existing .docx + FormatSpec → formatted bytes + summary */
 export async function formatDocxWithEngine(
   docxBytes: ArrayBuffer | Uint8Array,
   spec: unknown,
-): Promise<Uint8Array> {
+): Promise<EngineDocResult> {
   const form = new FormData();
   const blob = new Blob([docxBytes as BlobPart], {
     type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -59,14 +89,14 @@ export async function formatDocxWithEngine(
   if (!res.ok) {
     throw new DocEngineError(await readErrorMessage(res), res.status >= 500 ? 502 : 400);
   }
-  return new Uint8Array(await res.arrayBuffer());
+  return parseEngineJson(res);
 }
 
 /** Markdown + FormatSpec → .docx bytes */
 export async function markdownToDocxWithEngine(
   markdown: string,
   spec: unknown,
-): Promise<Uint8Array> {
+): Promise<EngineDocResult> {
   let res: Response;
   try {
     res = await fetch(`${docEngineBaseUrl()}/v1/md-to-docx`, {
@@ -82,7 +112,7 @@ export async function markdownToDocxWithEngine(
   if (!res.ok) {
     throw new DocEngineError(await readErrorMessage(res), res.status >= 500 ? 502 : 400);
   }
-  return new Uint8Array(await res.arrayBuffer());
+  return parseEngineJson(res);
 }
 
 export function bytesToBase64(bytes: Uint8Array): string {

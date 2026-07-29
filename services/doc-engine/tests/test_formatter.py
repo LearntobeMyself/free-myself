@@ -1,50 +1,51 @@
-"""Lightweight tests for the Python doc-engine."""
+"""Tests for forced visible formatting."""
 
 from __future__ import annotations
 
 import io
 
 from docx import Document
-from docx.shared import Cm, Pt
+from docx.shared import Pt
 
 from formatter import format_existing_docx, markdown_to_docx
 
-
-DEFAULT_SPEC = {
+# Deliberately exaggerated so tests catch "no-op" formatting.
+LOUD_SPEC = {
     "meta": {
-        "name": "课程报告规范",
-        "scene": "course-report",
+        "name": "夸张测试规范",
+        "scene": "test",
         "paper": "A4",
-        "marginCm": {"top": 2.54, "bottom": 2.54, "left": 3.17, "right": 3.17},
+        "marginCm": {"top": 2.0, "bottom": 2.0, "left": 4.0, "right": 2.5},
     },
     "styles": [
         {
             "role": "title",
             "fontEastAsia": "黑体",
-            "fontAscii": "Times New Roman",
-            "fontSizePt": 16,
+            "fontAscii": "Arial",
+            "fontSizePt": 22,
             "bold": True,
             "align": "center",
             "lineSpacing": 1.5,
             "firstLineIndentChars": 0,
         },
         {
-            "role": "body",
-            "fontEastAsia": "宋体",
-            "fontAscii": "Times New Roman",
-            "fontSizePt": 12,
-            "align": "both",
-            "lineSpacing": 1.5,
-            "firstLineIndentChars": 2,
-        },
-        {
             "role": "heading1",
             "fontEastAsia": "黑体",
-            "fontAscii": "Times New Roman",
-            "fontSizePt": 14,
+            "fontAscii": "Arial",
+            "fontSizePt": 18,
             "bold": True,
             "align": "left",
             "lineSpacing": 1.5,
+        },
+        {
+            "role": "body",
+            "fontEastAsia": "楷体",
+            "fontAscii": "Arial",
+            "fontSizePt": 18,
+            "bold": False,
+            "align": "both",
+            "lineSpacing": 2.0,
+            "firstLineIndentChars": 2,
         },
     ],
     "mdMapping": {
@@ -68,26 +69,29 @@ def _sample_docx_bytes() -> bytes:
     return buf.getvalue()
 
 
-def test_format_docx_margins_and_body_font():
-    out = format_existing_docx(_sample_docx_bytes(), DEFAULT_SPEC)
+def test_format_docx_loud_margins_and_fonts():
+    out, summary = format_existing_docx(_sample_docx_bytes(), LOUD_SPEC)
+    assert summary["paragraphsStyled"] >= 3
+    assert summary["bodySizePt"] == 18
+
     doc = Document(io.BytesIO(out))
     section = doc.sections[0]
-    assert abs(section.left_margin.cm - 3.17) < 0.05
-    assert abs(section.top_margin.cm - 2.54) < 0.05
+    assert abs(section.left_margin.cm - 4.0) < 0.05
 
-    body_paras = [p for p in doc.paragraphs if p.text.strip()]
-    assert len(body_paras) >= 2
-    # last non-empty should be body-ish with Song / 12pt
-    last = body_paras[-1]
-    assert last.runs
-    assert last.runs[0].font.size == Pt(12)
+    paras = [p for p in doc.paragraphs if p.text.strip()]
+    assert paras[0].runs
+    assert paras[0].runs[0].font.size == Pt(22)
+    assert paras[0].runs[0].font.bold is True
+
+    body = paras[-1]
+    assert body.runs[0].font.size == Pt(18)
 
 
-def test_md_to_docx_produces_paragraphs():
+def test_md_to_docx_loud_body():
     md = "# 人工智能导论\n\n## 背景\n\n本节讨论排版。\n"
-    out = markdown_to_docx(md, DEFAULT_SPEC)
+    out, summary = markdown_to_docx(md, LOUD_SPEC)
+    assert summary["paragraphsStyled"] >= 2
     doc = Document(io.BytesIO(out))
+    assert abs(doc.sections[0].left_margin.cm - 4.0) < 0.05
     texts = [p.text for p in doc.paragraphs if p.text.strip()]
     assert "人工智能导论" in texts[0]
-    assert any("背景" in t for t in texts)
-    assert abs(doc.sections[0].left_margin.cm - 3.17) < 0.05

@@ -6,12 +6,16 @@ import json
 from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
-from formatter import format_existing_docx, markdown_to_docx
+from formatter import (
+    STYLE_CATALOG,
+    bytes_to_b64,
+    format_existing_docx,
+    markdown_to_docx,
+)
 
-app = FastAPI(title="Free myself doc-engine", version="0.1.0")
+app = FastAPI(title="Free myself doc-engine", version="0.2.0")
 
 
 class MdToDocxBody(BaseModel):
@@ -24,11 +28,16 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/v1/catalog")
+def catalog() -> dict[str, Any]:
+    return STYLE_CATALOG
+
+
 @app.post("/v1/format-docx")
 async def format_docx(
     file: UploadFile = File(...),
     spec: str = Form(...),
-) -> Response:
+) -> dict[str, Any]:
     try:
         spec_obj = json.loads(spec)
     except json.JSONDecodeError as e:
@@ -42,26 +51,28 @@ async def format_docx(
         raise HTTPException(status_code=400, detail="empty file")
 
     try:
-        out = format_existing_docx(raw, spec_obj)
-    except Exception as e:  # noqa: BLE001 — surface engine errors to client
+        out, summary = format_existing_docx(raw, spec_obj)
+    except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=f"format failed: {e}") from e
 
-    return Response(
-        content=out,
-        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={"Content-Disposition": 'attachment; filename="formatted.docx"'},
-    )
+    return {
+        "ok": True,
+        "docxBase64": bytes_to_b64(out),
+        "byteLength": len(out),
+        "summary": summary,
+    }
 
 
 @app.post("/v1/md-to-docx")
-async def md_to_docx(body: MdToDocxBody) -> Response:
+async def md_to_docx(body: MdToDocxBody) -> dict[str, Any]:
     try:
-        out = markdown_to_docx(body.markdown, body.spec)
+        out, summary = markdown_to_docx(body.markdown, body.spec)
     except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=f"convert failed: {e}") from e
 
-    return Response(
-        content=out,
-        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={"Content-Disposition": 'attachment; filename="from-markdown.docx"'},
-    )
+    return {
+        "ok": True,
+        "docxBase64": bytes_to_b64(out),
+        "byteLength": len(out),
+        "summary": summary,
+    }

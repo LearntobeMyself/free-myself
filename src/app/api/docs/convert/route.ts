@@ -36,11 +36,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "请粘贴或上传 Markdown 内容" }, { status: 400 });
     }
 
-    const out = await markdownToDocxWithEngine(markdown, spec);
+    const { bytes, summary } = await markdownToDocxWithEngine(markdown, spec);
     return NextResponse.json({
       ok: true,
-      docxBase64: bytesToBase64(out),
-      byteLength: out.byteLength,
+      docxBase64: bytesToBase64(bytes),
+      byteLength: bytes.byteLength,
+      summary,
       engine: "python",
     });
   } catch (e) {

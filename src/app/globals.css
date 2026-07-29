@@ -473,6 +473,110 @@ a {
   max-width: 42rem;
 }
 
+.fm-docs-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fm-docs-layout-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.fm-docs-split {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .fm-docs-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.fm-docs-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.fm-docs-role-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.fm-docs-role-tab {
+  border: 1px solid var(--border);
+  background: var(--bg-1);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.fm-docs-role-tab.is-active {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+.fm-docs-knobs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.fm-docs-knob {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+.fm-docs-knob-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 1.4rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.fm-docs-margins {
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.fm-docs-preview-pane {
+  position: sticky;
+  top: 5.5rem;
+  min-width: 0;
+}
+
+.fm-docs-paper {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: var(--shadow-soft);
+  min-height: 22rem;
+  color: #111;
+}
+
+.fm-docs-paper p {
+  margin: 0 0 0.65em;
+}
+
 .fm-docs-spec-bar {
   display: flex;
   flex-wrap: wrap;
@@ -530,7 +634,7 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  min-height: 9.5rem;
+  min-height: 7.5rem;
   padding: 1.25rem;
   border-radius: var(--radius);
   border: 1.5px dashed rgba(20, 24, 28, 0.22);
@@ -568,7 +672,7 @@ a {
 }
 
 .fm-docs-md-textarea {
-  min-height: 9rem;
+  min-height: 7rem;
 }
 
 .fm-docs-result {

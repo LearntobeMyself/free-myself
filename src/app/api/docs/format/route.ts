@@ -58,11 +58,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "请上传 .docx 文件" }, { status: 400 });
     }
 
-    const out = await formatDocxWithEngine(docxBytes, spec);
+    const { bytes, summary } = await formatDocxWithEngine(docxBytes, spec);
     return NextResponse.json({
       ok: true,
-      docxBase64: bytesToBase64(out),
-      byteLength: out.byteLength,
+      docxBase64: bytesToBase64(bytes),
+      byteLength: bytes.byteLength,
+      summary,
       engine: "python",
     });
   } catch (e) {
