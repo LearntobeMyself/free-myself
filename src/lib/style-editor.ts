@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import {
   DEFAULT_MATCH_RULES,
+  MATCH_PRESETS,
   defaultCourseReportSpec,
   type FormatSpec,
   type MatchRule,
@@ -93,6 +94,63 @@ export function patchTable(spec: FormatSpec, patch: Partial<TableSpec>): FormatS
 
 export function setMatchRules(spec: FormatSpec, rules: MatchRule[]): FormatSpec {
   return { ...spec, matchRules: rules };
+}
+
+/** Toggle a preset on/off in matchRules (by underlying pattern). */
+export function toggleMatchPreset(spec: FormatSpec, presetId: string, on: boolean): FormatSpec {
+  const preset = MATCH_PRESETS.find((p) => p.id === presetId);
+  if (!preset) return spec;
+  const without = spec.matchRules.filter((r) => r.pattern !== preset.pattern);
+  if (!on) return setMatchRules(spec, without);
+  return setMatchRules(spec, [
+    ...without,
+    { role: preset.role, pattern: preset.pattern, flags: "i" },
+  ]);
+}
+
+export function isPresetEnabled(spec: FormatSpec, presetId: string): boolean {
+  const preset = MATCH_PRESETS.find((p) => p.id === presetId);
+  if (!preset) return false;
+  return spec.matchRules.some((r) => r.pattern === preset.pattern);
+}
+
+/** Current heading level assigned to a preset (falls back to preset default). */
+export function getPresetRole(spec: FormatSpec, presetId: string): StyleRole {
+  const preset = MATCH_PRESETS.find((p) => p.id === presetId);
+  if (!preset) return "body";
+  const found = spec.matchRules.find((r) => r.pattern === preset.pattern);
+  return found?.role ?? preset.role;
+}
+
+/** Change which heading level a checked preset maps to. */
+export function setPresetRole(
+  spec: FormatSpec,
+  presetId: string,
+  role: StyleRole,
+): FormatSpec {
+  const preset = MATCH_PRESETS.find((p) => p.id === presetId);
+  if (!preset) return spec;
+  const has = spec.matchRules.some((r) => r.pattern === preset.pattern);
+  if (!has) {
+    return setMatchRules(spec, [
+      ...spec.matchRules,
+      { role, pattern: preset.pattern, flags: "i" },
+    ]);
+  }
+  return setMatchRules(
+    spec,
+    spec.matchRules.map((r) =>
+      r.pattern === preset.pattern ? { ...r, role } : r,
+    ),
+  );
+}
+
+/** 「以 xxx 开头」→ 安全转成匹配规则，用户无需写正则 */
+export function startsWithRule(role: StyleRole, text: string): MatchRule | null {
+  const t = text.trim();
+  if (!t) return null;
+  const escaped = t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return { role, pattern: `^${escaped}`, flags: "i" };
 }
 
 export function cssFromStyle(style: StyleDef): CSSProperties {

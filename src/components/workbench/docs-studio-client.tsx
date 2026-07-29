@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState, type DragEvent } from "react";
-import type { FormatSpec, MatchRule, StyleRole } from "@/lib/format-spec";
 import {
   COLOR_PRESETS,
   EDIT_ROLES,
@@ -9,13 +8,19 @@ import {
   FONT_EAST,
   ROLE_LABELS,
   cssFromStyle,
+  isPresetEnabled,
+  getPresetRole,
   patchMargins,
   patchRole,
   patchTable,
   setMatchRules,
+  setPresetRole,
+  startsWithRule,
   styleOf,
+  toggleMatchPreset,
   visibleCourseReportSpec,
 } from "@/lib/style-editor";
+import { MATCH_PRESETS, type FormatSpec, type StyleRole } from "@/lib/format-spec";
 
 type Tab = "word" | "markdown";
 
@@ -64,12 +69,14 @@ export function DocsStudioClient(_props: {
   const [tab, setTab] = useState<Tab>("word");
   const [docxFile, setDocxFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
-  const [rulesOpen, setRulesOpen] = useState(false);
+  const [rulesOpen, setRulesOpen] = useState(true);
+  const [customStart, setCustomStart] = useState("第1章");
+  const [customRole, setCustomRole] = useState<StyleRole>("heading1");
   const [markdown, setMarkdown] = useState(
     "# 人工智能导论\n\n## 背景\n\n本节讨论大模型与文档排版。\n\n### 方法\n\n#### 细节\n\n正文段落。",
   );
   const [status, setStatus] = useState(
-    "任意 .docx 都可上传。用匹配规则告诉系统什么是标题；标题默认黑色。",
+    "勾选你文章里有的标题样子即可，不用写正则。任意 .docx 都能上传。",
   );
   const [busy, setBusy] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -96,21 +103,22 @@ export function DocsStudioClient(_props: {
     setSpec((s) => patchRole(s, activeRole, patch));
   }
 
-  function updateRule(index: number, patch: Partial<MatchRule>) {
+  function addCustomStartsWith() {
+    const rule = startsWithRule(customRole, customStart);
+    if (!rule) {
+      setStatus("请先填写「以什么开头」");
+      return;
+    }
     setSpec((s) => {
-      const rules = s.matchRules.map((r, i) => (i === index ? { ...r, ...patch } : r));
-      return setMatchRules(s, rules);
+      const exists = s.matchRules.some(
+        (r) => r.pattern === rule.pattern && r.role === rule.role,
+      );
+      if (exists) return s;
+      return setMatchRules(s, [...s.matchRules, rule]);
     });
-  }
-
-  function addRule() {
-    setSpec((s) =>
-      setMatchRules(s, [...s.matchRules, { role: "heading1", pattern: "^第.+章" }]),
+    setStatus(
+      `已添加：以「${customStart.trim()}」开头 → ${ROLE_LABELS[customRole] ?? customRole}`,
     );
-  }
-
-  function removeRule(index: number) {
-    setSpec((s) => setMatchRules(s, s.matchRules.filter((_, i) => i !== index)));
   }
 
   function pickDocx(file: File | null) {
@@ -218,7 +226,7 @@ export function DocsStudioClient(_props: {
         <div>
           <h1 className="fm-workbench-title">文档工坊</h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
-            上传任意 Word；用匹配规则识别标题；样式含 H4 / 表格；标题默认黑色（不再用主题蓝）。
+            勾选标题长什么样即可（不用正则）。任意 Word 都能上传；字色默认黑色。
           </p>
         </div>
         <button
@@ -488,53 +496,107 @@ export function DocsStudioClient(_props: {
 
           <div className="fm-docs-margins">
             <div className="mb-2 flex items-center justify-between gap-2">
-              <p className="fm-section-label mb-0">标题匹配规则</p>
+              <p className="fm-section-label mb-0">你的标题长什么样？</p>
               <button
                 type="button"
                 className="fm-btn"
                 onClick={() => setRulesOpen((v) => !v)}
               >
-                {rulesOpen ? "收起" : "编辑规则"}
+                {rulesOpen ? "收起" : "展开"}
               </button>
             </div>
             {rulesOpen ? (
-              <div className="space-y-2">
-                <p className="text-xs text-[var(--text-faint)]">
-                  支持通配如 <code>第*章</code>，或正则如 <code>^第.+章</code>。从上到下匹配。
+              <div className="space-y-3">
+                <p className="text-sm text-[var(--text-muted)]">
+                  左边勾「文章里有没有这种样子」，右边选「当成几级标题」。
+                  默认已经帮你配对好了（章→H1，一、→H2，等），不对再改右边。
                 </p>
-                {spec.matchRules.map((rule, i) => (
-                  <div key={i} className="flex flex-wrap items-center gap-2">
-                    <select
-                      className="fm-select max-w-[8rem]"
-                      value={rule.role}
-                      onChange={(e) =>
-                        updateRule(i, { role: e.target.value as StyleRole })
-                      }
-                    >
-                      {RULE_ROLES.map((r) => (
-                        <option key={r} value={r}>
-                          {ROLE_LABELS[r] ?? r}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      className="fm-input min-w-[12rem] flex-1"
-                      value={rule.pattern}
-                      onChange={(e) => updateRule(i, { pattern: e.target.value })}
-                      placeholder="匹配模式"
-                    />
-                    <button type="button" className="fm-btn" onClick={() => removeRule(i)}>
-                      删
+                <div className="fm-match-presets">
+                  {MATCH_PRESETS.map((p) => {
+                    const on = isPresetEnabled(spec, p.id);
+                    const role = getPresetRole(spec, p.id);
+                    return (
+                      <div key={p.id} className={`fm-match-row ${on ? "is-on" : ""}`}>
+                        <label className="fm-match-row-check">
+                          <input
+                            type="checkbox"
+                            checked={on}
+                            onChange={(e) =>
+                              setSpec((s) => toggleMatchPreset(s, p.id, e.target.checked))
+                            }
+                          />
+                          <span>
+                            <span className="fm-match-chip-label">{p.label}</span>
+                            <span className="fm-match-chip-hint">{p.hint}</span>
+                          </span>
+                        </label>
+                        <div className="fm-match-row-level">
+                          <span className="fm-match-row-arrow">→</span>
+                          <select
+                            className="fm-select"
+                            disabled={!on}
+                            value={role}
+                            aria-label={`${p.label} 当作哪一级`}
+                            onChange={(e) =>
+                              setSpec((s) =>
+                                setPresetRole(s, p.id, e.target.value as StyleRole),
+                              )
+                            }
+                          >
+                            {RULE_ROLES.map((r) => (
+                              <option key={r} value={r}>
+                                {ROLE_LABELS[r] ?? r}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-1)] p-3 space-y-2">
+                  <p className="text-sm font-medium text-[var(--text)]">自定义：以某段文字开头</p>
+                  <p className="text-xs text-[var(--text-faint)]">
+                    例如填「附录」，选「一级 H1」，就会把以「附录」开头的段落当标题。
+                  </p>
+                  <div className="flex flex-wrap items-end gap-2">
+                    <label className="fm-docs-knob min-w-[8rem] flex-1">
+                      <span>以什么开头</span>
+                      <input
+                        className="fm-input"
+                        value={customStart}
+                        onChange={(e) => setCustomStart(e.target.value)}
+                        placeholder="第1章"
+                      />
+                    </label>
+                    <label className="fm-docs-knob min-w-[7rem]">
+                      <span>当作</span>
+                      <select
+                        className="fm-select"
+                        value={customRole}
+                        onChange={(e) => setCustomRole(e.target.value as StyleRole)}
+                      >
+                        {RULE_ROLES.map((r) => (
+                          <option key={r} value={r}>
+                            {ROLE_LABELS[r] ?? r}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button type="button" className="fm-btn fm-btn-primary" onClick={addCustomStartsWith}>
+                      添加
                     </button>
                   </div>
-                ))}
-                <button type="button" className="fm-btn" onClick={addRule}>
-                  加一条规则
-                </button>
+                </div>
               </div>
             ) : (
               <p className="text-xs text-[var(--text-faint)]">
-                已启用 {spec.matchRules.length} 条（如「第…章」→ H1）。点编辑可改成你文章的格式。
+                已勾选 {MATCH_PRESETS.filter((p) => isPresetEnabled(spec, p.id)).length} 种常用格式
+                {spec.matchRules.length > MATCH_PRESETS.length
+                  ? `，另有 ${spec.matchRules.length - MATCH_PRESETS.length} 条自定义`
+                  : ""}
+                。
               </p>
             )}
           </div>

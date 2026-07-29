@@ -58,15 +58,72 @@ export const TableSpecSchema = z.object({
 
 export type TableSpec = z.infer<typeof TableSpecSchema>;
 
-export const DEFAULT_MATCH_RULES: MatchRule[] = [
-  { role: "heading1", pattern: "^第.+[章节部]" },
-  { role: "heading2", pattern: "^[一二三四五六七八九十]+[、.．]" },
-  { role: "heading2", pattern: "^\\d+[、.](?!\\d)" },
-  { role: "heading4", pattern: "^\\d+\\.\\d+\\.\\d+" },
-  { role: "heading3", pattern: "^\\d+\\.\\d+(?!\\.\\d)" },
-  { role: "heading3", pattern: "^[（(][一二三四五六七八九十\\d]+[）)]" },
-  { role: "bibliography", pattern: "^参考文献" },
+export type MatchPreset = {
+  id: string;
+  label: string;
+  hint: string;
+  role: StyleRole;
+  pattern: string;
+};
+
+/** Human-friendly presets — no regex shown to users. */
+export const MATCH_PRESETS: MatchPreset[] = [
+  {
+    id: "chapter",
+    label: "第X章 / 第X节",
+    hint: "例：第1章 绪论",
+    role: "heading1",
+    pattern: "^第.+[章节部]",
+  },
+  {
+    id: "cn-enum",
+    label: "一、二、三、",
+    hint: "例：一、研究目标",
+    role: "heading2",
+    pattern: "^[一二三四五六七八九十]+[、.．]",
+  },
+  {
+    id: "num-enum",
+    label: "1. / 1、",
+    hint: "例：1. 概述",
+    role: "heading2",
+    pattern: "^\\d+[、.](?!\\d)",
+  },
+  {
+    id: "paren-cn",
+    label: "（一）（二）",
+    hint: "例：（一）数据来源",
+    role: "heading3",
+    pattern: "^[（(][一二三四五六七八九十\\d]+[）)]",
+  },
+  {
+    id: "num-2",
+    label: "1.1 小节",
+    hint: "例：1.2 方法",
+    role: "heading3",
+    pattern: "^\\d+\\.\\d+(?!\\.\\d)",
+  },
+  {
+    id: "num-3",
+    label: "1.1.1 细标题",
+    hint: "例：1.1.1 标注约定",
+    role: "heading4",
+    pattern: "^\\d+\\.\\d+\\.\\d+",
+  },
+  {
+    id: "refs",
+    label: "参考文献",
+    hint: "以「参考文献」开头的段落",
+    role: "bibliography",
+    pattern: "^参考文献",
+  },
 ];
+
+export const DEFAULT_MATCH_RULES: MatchRule[] = MATCH_PRESETS.map((p) => ({
+  role: p.role,
+  pattern: p.pattern,
+  flags: "i",
+}));
 
 export const DEFAULT_TABLE_SPEC: TableSpec = {
   headerBold: true,
