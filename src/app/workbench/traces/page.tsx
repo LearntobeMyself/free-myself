@@ -18,7 +18,8 @@ export default async function TracesPage() {
           <Link
             key={run.id}
             href={`/workbench/traces/${run.id}`}
-            className="fm-panel block p-4 hover:bg-[var(--bg-2)]"
+            prefetch
+            className="fm-panel block p-4 transition-colors hover:bg-[var(--bg-2)]"
           >
             <div className="flex items-center justify-between gap-3">
               <div>

@@ -1,4 +1,4 @@
-import { WorkbenchNav } from "@/components/layout/nav";
+import { WorkbenchNav } from "@/components/layout/workbench-nav";
 
 export default function WorkbenchLayout({
   children,
