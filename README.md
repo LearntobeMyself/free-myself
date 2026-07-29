@@ -2,7 +2,7 @@
 
 个人解放站 + **Harness 练兵场**。
 
-对外仓库 = Model + Harness** 的实践作品：对外是 LearntobeMyself 的项目主页，对内是可验证的工作台（Context Passport、Open Loop、Document Studio、Traces）。
+对外仓库 = Model + Harness** 的实践作品：对外是 LearntobeMyself 的 GitHub 项目墙，对内是可验证的工作台（Context Passport、Open Loop、Document Studio、Traces）。
 
 仓库：[https://github.com/LearntobeMyself/free-myself](https://github.com/LearntobeMyself/free-myself)
 
@@ -14,7 +14,17 @@ npm run dev
 npm test
 ```
 
-- Public site: `/`
+Optional (private repos / higher API quota):
+
+```bash
+# PowerShell
+$env:GITHUB_TOKEN="ghp_xxx"
+npm run dev
+```
+
+Never commit the token. Copy placeholders only into `.env.example` if needed.
+
+- Public site: `/` (live GitHub repos)
 - Workbench: `/workbench`
 - Harness notes: [`docs/harness.md`](docs/harness.md)
 
@@ -22,10 +32,15 @@ npm test
 
 | Area | Why it exists |
 |---|---|
-| Context Passport | Stop re-explaining yourself to every AI session; export AGENTS.md / Cursor rules; drift-check commands |
+| GitHub Projects | Show *your* real repositories, not fake local cards |
+| Context Passport | Stop re-explaining yourself to every AI session; export AGENTS.md / Cursor rules |
 | Open Loop | Paste chat → extract *my* commitments with source spans |
-| Document Studio | **Your Format Spec** drives Word formatting and Markdown↔Word; same Spec verifies the result |
+| Document Studio | **Your Format Spec** drives Word / Markdown↔Word; same Spec verifies the result |
 | Mini Harness | Loop / tools / verify / traces — career practice for harness engineering |
+
+## Release cadence
+
+Feature slice → tests green → single commit → push. See [`AGENTS.md`](AGENTS.md) for the do-not-commit list.
 
 ## Document Studio difference
 
@@ -36,12 +51,10 @@ We do **not** compete with “pick a pretty template” formatters.
 3. Verifier checks the **same** Spec
 4. Trace shows each harness step
 
-v1 focuses on common Chinese academic/office fields (fonts, size, spacing, margins, heading/body roles). Complex floating layouts and full thesis template packs are explicitly out of scope for now.
-
 ## Architecture
 
 ```text
-Public pages ──► projects grid (WIP detail placeholders)
+Public pages ──► GitHub API project grid + detail placeholders
 Workbench   ──► Passport / Open Loop / Docs / Traces
                  └─► src/harness (shared runtime)
 ```

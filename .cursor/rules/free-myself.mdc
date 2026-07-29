@@ -7,7 +7,9 @@ alwaysApply: true
 
 - Treat `src/harness` as the execution spine for workbench features.
 - Prefer deterministic tools for apply/verify; models only for NL understanding when present.
-- After each feature: run `npm test` before committing.
+- After each feature slice: run `npm test` before committing; push that slice alone.
 - Do not edit the plan file in `.cursor/plans`.
 - Document formatting must go through Format Spec + verifier, not opaque beautify templates.
 - Keep Chinese UI copy concise; brand name is **Free Myself**.
+- Never commit `.env*`, `data/**/*.json`, uploads, or tokens. Use `GITHUB_TOKEN` only via env/secrets.
+- Public UI stays light and spacious (kimi-inspired), not a dark IDE clone.
