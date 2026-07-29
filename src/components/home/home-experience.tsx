@@ -46,22 +46,23 @@ export function HomeExperience({
           <div className="mx-auto max-w-3xl text-center">
             <Reveal>
               <p className="mb-5 text-sm font-medium tracking-[0.14em] text-[var(--text-faint)]">
-                学着把自己解放出来
+                LearntobeMyself
               </p>
             </Reveal>
             <Reveal delayMs={80}>
               <h1 className="fm-display text-[clamp(3rem,8vw,5.6rem)] leading-[1.02] text-[var(--text)]">
-                解放自己
+                Free myself
               </h1>
             </Reveal>
             <Reveal delayMs={160}>
               <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[var(--text-muted)] md:text-xl">
-                对外展示你的真实项目；对内用工具台处理那些费时却不得不做的事——少重复解释、少漏跟进、少为格式抓狂。
+                对外放真实项目；对内用本机工具改 Word / Markdown
+                格式——按你自己的规范来，改完直接下载。
               </p>
             </Reveal>
             <Reveal delayMs={240}>
               <div className="fm-hero-prompt mx-auto">
-                想看作品，往下滚；想办事，打开工作台。
+                想看作品往下滚；要改格式，进工作台。
               </div>
             </Reveal>
             <Reveal delayMs={320}>
@@ -69,8 +70,8 @@ export function HomeExperience({
                 <Link href="/#projects" className="fm-btn fm-btn-primary fm-btn-press">
                   浏览项目
                 </Link>
-                <Link href="/workbench" className="fm-btn fm-btn-press">
-                  打开工作台
+                <Link href="/workbench/docs" className="fm-btn fm-btn-press">
+                  打开文档工坊
                 </Link>
               </div>
             </Reveal>
@@ -87,7 +88,7 @@ export function HomeExperience({
         <Reveal className="mb-12 max-w-2xl">
           <h2 className="fm-display text-3xl md:text-4xl">我的项目</h2>
           <p className="mt-3 text-[1.02rem] text-[var(--text-muted)]">
-            直接来自 GitHub 账号上的仓库。还没做完的演示，点进去会看到预留说明，不会装成已经完工。
+            直接拉 GitHub 上的公开仓库。演示没做完的会标明，不会假装已经完工。
           </p>
         </Reveal>
 
@@ -118,16 +119,16 @@ export function HomeExperience({
         <div className="mx-auto grid max-w-6xl gap-10 px-5 py-20 md:grid-cols-3">
           {[
             {
-              title: "少重复解释",
-              body: "把偏好和项目约定记进护照，下次交给 AI 时不用从头说一遍。",
+              title: "上传你的稿",
+              body: "Word 或 Markdown 都行。改的是你自己写好的内容，不是空模板。",
             },
             {
-              title: "少漏跟进",
-              body: "从聊天里抽出「我答应做的事」，带着原文，状态一目了然。",
+              title: "按你的规范改",
+              body: "字体、字号、行距、页边距写清楚一次，之后每次套同一套规则。",
             },
             {
-              title: "少为格式抓狂",
-              body: "你写清排版要求，系统按要求改，并用同一套要求验收。",
+              title: "下载交差",
+              body: "本机跑排版服务，改完直接下 .docx。不上传云端，不装成万能美化。",
             },
           ].map((item, i) => (
             <Reveal key={item.title} delayMs={i * 90}>

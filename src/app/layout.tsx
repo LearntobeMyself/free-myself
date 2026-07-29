@@ -23,8 +23,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "解放自己",
-  description: "个人解放站：展示真实项目，处理费时琐事 — LearntobeMyself",
+  title: "Free myself",
+  description: "展示真实项目，本机改 Word / Markdown 格式 — LearntobeMyself",
 };
 
 export default function RootLayout({
@@ -41,7 +41,7 @@ export default function RootLayout({
         <SiteHeader />
         <div className="flex-1">{children}</div>
         <footer className="border-t border-[var(--border)] py-10 text-center text-sm text-[var(--text-faint)]">
-          解放自己 · 把重复劳动交出去 · LearntobeMyself
+          Free myself · 本机改稿，少为格式折腾 · LearntobeMyself
         </footer>
       </body>
     </html>

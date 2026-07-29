@@ -5,15 +5,6 @@ import {
   normalizeSpec,
   validateSpec,
 } from "@/lib/format-spec";
-import {
-  blocksToMarkdown,
-  buildDocxFromBlocks,
-  inferBlocksFromText,
-  markdownToDocx,
-  parseMarkdownToBlocks,
-  structureDiff,
-  verifyBlocksAgainstSpec,
-} from "@/lib/document-engine";
 
 describe("format spec", () => {
   it("normalizes default course report spec", () => {
@@ -42,35 +33,5 @@ describe("format spec", () => {
         styles: [{ role: "body", fontSizePt: -1 }],
       }),
     ).toThrow();
-  });
-});
-
-describe("document engine", () => {
-  it("formats messy text and verifies", async () => {
-    const spec = defaultCourseReportSpec();
-    const blocks = inferBlocksFromText(
-      "课程报告标题\n第一章 绪论\n正文第一段。\n参考文献\n[1] Someone 2026.",
-    );
-    const buf = await buildDocxFromBlocks(blocks, spec);
-    expect(buf.byteLength).toBeGreaterThan(1000);
-    const verifier = verifyBlocksAgainstSpec(blocks, spec);
-    expect(verifier.passed).toBe(true);
-  });
-
-  it("roundtrips markdown structure", async () => {
-    const spec = defaultCourseReportSpec();
-    const md = "# 标题\n\n## 小节\n\n一段正文。\n\n> 引用\n\n```\ncode\n```";
-    const { buffer, blocks } = await markdownToDocx(md, spec);
-    expect(buffer.byteLength).toBeGreaterThan(1000);
-    const back = blocksToMarkdown(blocks);
-    const diffs = structureDiff(md, back);
-    expect(diffs).toEqual([]);
-  });
-
-  it("maps markdown headings via spec", () => {
-    const spec = defaultCourseReportSpec();
-    const blocks = parseMarkdownToBlocks("## Hello\n\nworld", spec);
-    expect(blocks[0]?.role).toBe("heading2");
-    expect(blocks[1]?.role).toBe("body");
   });
 });

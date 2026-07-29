@@ -87,10 +87,10 @@ export default async function ProjectDetailPage({ params }: Props) {
           <div className="fm-panel mt-6 space-y-3 p-6">
             <h2 className="text-lg font-medium">本站工作台</h2>
             <p className="text-[var(--text-muted)]">
-              护照、未闭环、文档工坊、运行轨迹都在工作台里。
+              文档工坊：上传 Word / Markdown，按你的规范改格式后下载。
             </p>
-            <Link href="/workbench" className="fm-btn fm-btn-primary inline-flex">
-              打开工作台
+            <Link href="/workbench/docs" className="fm-btn fm-btn-primary inline-flex">
+              打开文档工坊
             </Link>
           </div>
         )}

@@ -3,13 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const items = [
-  { href: "/workbench", label: "总览", exact: true },
-  { href: "/workbench/passport", label: "上下文护照" },
-  { href: "/workbench/open-loop", label: "未闭环" },
-  { href: "/workbench/docs", label: "文档工坊" },
-  { href: "/workbench/traces", label: "运行轨迹" },
-];
+const items = [{ href: "/workbench/docs", label: "文档工坊" }];
 
 export function WorkbenchNav() {
   const pathname = usePathname();
@@ -21,9 +15,8 @@ export function WorkbenchNav() {
       </div>
       <ul className="space-y-0.5">
         {items.map((item) => {
-          const active = item.exact
-            ? pathname === item.href
-            : pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active =
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
             <li key={item.href}>
               <Link

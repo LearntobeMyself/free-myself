@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "doc-engine": "uvicorn main:app --app-dir services/doc-engine --host 127.0.0.1 --port 8765",
+    "doc-engine:test": "python -m pytest services/doc-engine/tests -q"
   },
   "dependencies": {
     "docx": "^9.7.1",

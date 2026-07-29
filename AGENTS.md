@@ -1,4 +1,4 @@
-# AGENTS.md — Free Myself
+# AGENTS.md — Free myself
 
 This repository is both a product and a **Harness Engineering** training ground.
 
@@ -11,18 +11,18 @@ This repository is both a product and a **Harness Engineering** training ground.
 
 ## Project map
 
-- `src/harness/` — mini agent loop, tool registry, trace store
+- `services/doc-engine/` — **Python** FastAPI + python-docx (Word 改格式 / MD→Word)
+- `src/lib/doc-engine-client.ts` — Next.js proxy to the Python service
+- `src/lib/format-spec.ts` — Format Spec schema (shared with Python)
 - `src/lib/github.ts` — live GitHub repos for LearntobeMyself
-- `src/lib/format-spec.ts` — user Format Spec language
-- `src/lib/document-engine.ts` — Word / Markdown apply + verify
-- `src/lib/passport.ts` — Context Passport
-- `src/lib/open-loop.ts` — commitment extraction
-- `src/app/workbench/` — private workbench UI
-- `evals/` — regression fixtures for harness + docs
+- `src/harness/` — mini agent loop (smoke + ingest_spec)
+- `src/app/workbench/docs` — Document Studio (only workbench product surface)
+- `evals/` — Vitest regressions
 
 ## Commands
 
 - `npm run dev` — local site
+- `npm run doc-engine` — Python formatter on `:8765` (activate venv first; see `services/doc-engine/README.md`)
 - `npm test` — Vitest (must be green before push)
 - `npm run build` — production build
 - `npm run lint` — ESLint
@@ -44,11 +44,12 @@ Do **not** batch unrelated features into one mega-commit.
 - `.env*` and any token/secret files (`GITHUB_TOKEN`, API keys)
 - `data/**/*.json` and other workbench runtime personal data
 - `uploads/`, `tmp/`, user-uploaded document binaries
+- `services/doc-engine/.venv/`
 - OS junk: `.DS_Store`, `Thumbs.db`, `*.pem`
 
 ## May commit
 
-- Source under `src/`, `evals/`, `docs/`, `content/` (non-secret config)
+- Source under `src/`, `services/doc-engine/` (no venv), `evals/`, `docs/`
 - CI workflows, `AGENTS.md`, `.cursor/rules`, empty `data/**/.gitkeep`
 - `.env.example` with placeholder keys only (no real secrets)
 
@@ -60,9 +61,8 @@ Do **not** batch unrelated features into one mega-commit.
 
 ## Preferences / constraints
 
-- Deterministic verifiers beat model self-grading.
+- Workbench product focus: Document Studio only (upload Word/MD → FormatSpec → download).
+- Document formatting is Python-first; do not reintroduce Node `docx` as the main path.
 - Do not ship untested feature points.
 - Do not build commodity PDF merge / image compress / generic OCR clones.
-- Document Studio is **spec-driven**: user requirements → apply → verify with the same spec.
-- Public UI: light, spacious, kimi-inspired — not dark IDE clones.
 - Prefer local `data/` for personal content.

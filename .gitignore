@@ -54,3 +54,9 @@ next-env.d.ts
 /uploads/
 *.local.docx
 *.local.pdf
+
+# Python doc-engine
+services/doc-engine/.venv/
+services/doc-engine/**/__pycache__/
+services/doc-engine/**/.pytest_cache/
+*.pyc

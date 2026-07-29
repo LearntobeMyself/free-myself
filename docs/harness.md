@@ -1,31 +1,32 @@
-# Harness map — Free Myself
+# Harness map — Free myself
 
-## What we built
+## Product focus
 
-A **mini agent harness** that turns workbench jobs into observable loops:
+Workbench is **Document Studio only**: upload Word / Markdown → FormatSpec → download Word.
+Formatting runs in **`services/doc-engine`** (Python FastAPI + python-docx).
+
+Next.js keeps UI, FormatSpec storage, and a thin proxy (`src/lib/doc-engine-client.ts`).
+
+## Mini harness (still in repo)
 
 ```text
 goal → policy decision → tool execute → observe → verify → continue | stop
 ```
 
-## Layers
-
 | Layer | Code | Responsibility |
 |---|---|---|
 | Loop | `src/harness/loop.ts` | Step budget, decisions, completion |
-| Tools | `src/harness/tools.ts` + `registry.ts` | Schema'd capabilities |
-| Trace | `src/harness/trace-store.ts` | Persist runs under `data/traces/` |
-| Verify | tool `verify_doc` + `verifyBlocksAgainstSpec` | Maker-checker |
-| Context | Passport + Format Spec | What the agent is allowed to know |
+| Tools | `src/harness/tools.ts` | Smoke tools + `ingest_spec` |
+| Trace | `src/harness/trace-store.ts` | Persist runs under `data/traces/` (optional) |
+| Spec | `src/lib/format-spec.ts` | Shared FormatSpec schema |
 | Eval | `evals/*.test.ts` | Prevent silent regressions |
 
-## Document Studio as harness homework
+## Doc engine
 
-1. `ingest_spec` — NL/JSON → FormatSpec
-2. `apply_styles` / `md_to_docx` — deterministic apply
-3. `verify_doc` — same Spec as acceptance criteria
-4. Repair loop once if verify fails
-5. Trace UI for postmortem
+1. Start: `npm run doc-engine` (needs `uvicorn` on PATH / venv activated)
+2. `POST /v1/format-docx` — existing Word + spec
+3. `POST /v1/md-to-docx` — Markdown + spec
+4. Next routes `/api/docs/format` and `/api/docs/convert` forward to it
 
 ## Outer harness (dogfood)
 
