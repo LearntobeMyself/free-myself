@@ -25,19 +25,27 @@ const cards = [
 
 export default function WorkbenchHome() {
   return (
-    <div className="fm-rise space-y-6">
-      <div>
-        <p className="fm-badge mb-3">private</p>
-        <h1 className="fm-display text-3xl">Workbench</h1>
-        <p className="mt-2 max-w-2xl text-[var(--text-muted)]">
-          Agent = Model + Harness。这里挂的是你的 Outer Harness：上下文、工具、循环、校验与观测。
+    <div className="fm-stack">
+      <header>
+        <p className="fm-section-label">Private</p>
+        <h1 className="fm-workbench-title">Workbench</h1>
+        <p className="fm-workbench-lead">
+          Agent = Model + Harness。这里是你的 Outer Harness：上下文、工具、循环、校验与观测——一屏一事。
         </p>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      </header>
+
+      <div className="grid gap-3 sm:grid-cols-2">
         {cards.map((c) => (
-          <Link key={c.href} href={c.href} className="fm-panel p-5 transition-colors hover:bg-[var(--bg-2)]">
-            <h2 className="text-lg font-medium">{c.title}</h2>
-            <p className="mt-2 text-sm text-[var(--text-muted)]">{c.body}</p>
+          <Link
+            key={c.href}
+            href={c.href}
+            prefetch
+            className="group rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg-1)] p-6 shadow-[var(--shadow-soft)] transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--bg-2)]"
+          >
+            <h2 className="text-lg font-semibold tracking-tight group-hover:text-[var(--accent)]">
+              {c.title}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">{c.body}</p>
           </Link>
         ))}
       </div>

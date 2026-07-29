@@ -35,15 +35,16 @@ export function OpenLoopClient({ initialItems }: { initialItems: Commitment[] })
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="fm-display text-3xl">Open Loop</h1>
-        <p className="mt-2 text-[var(--text-muted)]">
+    <div className="fm-stack">
+      <header>
+        <h1 className="fm-workbench-title">Open Loop</h1>
+        <p className="fm-workbench-lead">
           粘贴聊天/纪要 → 只抽「我该做的」→ 必须带原文引用。不做微信破解。
         </p>
-      </div>
+      </header>
 
-      <section className="fm-panel space-y-3 p-5">
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">Paste</h2>
         <textarea className="fm-textarea" value={text} onChange={(e) => setText(e.target.value)} />
         <button className="fm-btn fm-btn-primary" onClick={() => void extract()}>
           抽取承诺
@@ -62,9 +63,10 @@ export function OpenLoopClient({ initialItems }: { initialItems: Commitment[] })
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="fm-stack">
+        <h2 className="fm-section-label">Commitments</h2>
         {items.map((item) => (
-          <article key={item.id} className="fm-panel p-4">
+          <article key={item.id} className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg-1)] p-4 shadow-[var(--shadow-soft)]">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="font-medium">{item.text}</p>

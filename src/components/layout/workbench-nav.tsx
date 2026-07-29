@@ -15,8 +15,8 @@ export function WorkbenchNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="fm-panel h-fit p-3 md:sticky md:top-24">
-      <div className="mb-3 px-3 pt-1 text-[0.7rem] font-medium uppercase tracking-[0.16em] text-[var(--text-faint)]">
+    <aside className="h-fit md:sticky md:top-24">
+      <div className="mb-3 px-1 text-[0.7rem] font-medium uppercase tracking-[0.16em] text-[var(--text-faint)]">
         Workbench
       </div>
       <ul className="space-y-0.5">

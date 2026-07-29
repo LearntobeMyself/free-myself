@@ -6,20 +6,20 @@ export const dynamic = "force-dynamic";
 export default async function TracesPage() {
   const runs = await listRuns();
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="fm-display text-3xl">Traces</h1>
-        <p className="mt-2 text-[var(--text-muted)]">
+    <div className="fm-stack">
+      <header>
+        <h1 className="fm-workbench-title">Traces</h1>
+        <p className="fm-workbench-lead">
           每次 harness run 落盘可回放。失败先看工具与校验，而不是骂模型。
         </p>
-      </div>
-      <div className="space-y-3">
+      </header>
+      <div className="fm-stack">
         {runs.map((run) => (
           <Link
             key={run.id}
             href={`/workbench/traces/${run.id}`}
             prefetch
-            className="fm-panel block p-4 transition-colors hover:bg-[var(--bg-2)]"
+            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg-1)] p-4 shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--bg-2)]"
           >
             <div className="flex items-center justify-between gap-3">
               <div>

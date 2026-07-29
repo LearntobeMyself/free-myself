@@ -36,16 +36,16 @@ export function PassportClient({
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="fm-display text-3xl">Context Passport</h1>
-        <p className="mt-2 text-[var(--text-muted)]">
+    <div className="fm-stack">
+      <header>
+        <h1 className="fm-workbench-title">Context Passport</h1>
+        <p className="fm-workbench-lead">
           分层上下文：身份 / 偏好 / 项目护照 / 决策 / 交接。导出给 Cursor 与其他 Agent。
         </p>
-      </div>
+      </header>
 
-      <section className="fm-panel space-y-3 p-5">
-        <h2 className="font-medium">Identity</h2>
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">Identity</h2>
         <input
           className="fm-input"
           value={passport.identity.displayName}
@@ -74,8 +74,8 @@ export function PassportClient({
         </button>
       </section>
 
-      <section className="fm-panel space-y-3 p-5">
-        <h2 className="font-medium">Preferences</h2>
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">Preferences</h2>
         <ul className="space-y-1 text-sm text-[var(--text-muted)]">
           {passport.preferences.map((p) => (
             <li key={p}>· {p}</li>
@@ -107,8 +107,8 @@ export function PassportClient({
         </div>
       </section>
 
-      <section className="fm-panel space-y-3 p-5">
-        <h2 className="font-medium">Decision Log</h2>
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">Decision Log</h2>
         <input
           className="fm-input"
           placeholder="标题"
@@ -146,8 +146,8 @@ export function PassportClient({
         </ul>
       </section>
 
-      <section className="fm-panel space-y-3 p-5">
-        <h2 className="font-medium">Session Handoff</h2>
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">Session Handoff</h2>
         <textarea
           className="fm-textarea"
           placeholder="本次会话结束时写下：完成了什么、下一步、坑点"
@@ -165,8 +165,8 @@ export function PassportClient({
         </button>
       </section>
 
-      <section className="fm-panel space-y-3 p-5">
-        <h2 className="font-medium">Export & Drift</h2>
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">Export & Drift</h2>
         <div className="flex flex-wrap gap-2">
           <button className="fm-btn" onClick={() => patch({ action: "export_agents" })}>
             导出 AGENTS.md

@@ -246,3 +246,48 @@ a {
   border-color: rgba(20, 24, 28, 0.16);
   box-shadow: 0 12px 28px rgba(20, 24, 28, 0.06);
 }
+
+.fm-workbench-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 3vw, 2.35rem);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.fm-workbench-lead {
+  margin-top: 0.55rem;
+  max-width: 40rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.fm-section-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.75rem;
+}
+
+.fm-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.fm-panel-quiet {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+}
+
+.fm-panel-quiet:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}

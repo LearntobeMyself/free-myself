@@ -96,16 +96,16 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="fm-display text-3xl">Document Studio</h1>
-        <p className="mt-2 text-[var(--text-muted)]">
+    <div className="fm-stack">
+      <header>
+        <h1 className="fm-workbench-title">Document Studio</h1>
+        <p className="fm-workbench-lead">
           你的规范 → 系统执行 → 同一规范验收。不是选个漂亮模板就完事。
         </p>
-      </div>
+      </header>
 
-      <section className="fm-panel space-y-3 p-5">
-        <h2 className="font-medium">Format Spec</h2>
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">Format Spec</h2>
         <input
           className="fm-input"
           value={specName}
@@ -135,16 +135,16 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
         </select>
       </section>
 
-      <section className="fm-panel space-y-3 p-5">
-        <h2 className="font-medium">Word 一键规范排版</h2>
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">Word 一键规范排版</h2>
         <textarea className="fm-textarea" value={plain} onChange={(e) => setPlain(e.target.value)} />
         <button className="fm-btn fm-btn-primary" onClick={() => void formatWord()}>
           按 Spec 排版
         </button>
       </section>
 
-      <section className="fm-panel space-y-3 p-5">
-        <h2 className="font-medium">Markdown ↔ Word</h2>
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">Markdown ↔ Word</h2>
         <textarea
           className="fm-textarea min-h-48"
           value={markdown}
@@ -170,8 +170,8 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
         ) : null}
       </section>
 
-      <section className="fm-panel space-y-3 p-5">
-        <h2 className="font-medium">验收 / 产物</h2>
+      <section className="fm-panel-quiet space-y-3">
+        <h2 className="fm-section-label">验收 / 产物</h2>
         {downloadUrl ? (
           <a className="fm-btn" href={downloadUrl} download="free-myself.docx">
             下载 DOCX
