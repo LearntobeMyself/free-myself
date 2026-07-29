@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "free-myself",
+    "title": "Free Myself",
+    "summary": "个人解放站：公开作品集 + Context Passport + Document Studio + mini Agent Harness。",
+    "status": "shipping",
+    "tags": ["Next.js", "Harness", "Docs"],
+    "repo": "https://github.com/LearntobeMyself/free-myself"
+  },
+  {
+    "slug": "harness-lab",
+    "title": "Harness Lab",
+    "summary": "围绕 loop / tools / verify / trace 的练兵实验。详情页预留，代码仍在迭代。",
+    "status": "wip",
+    "tags": ["Agent", "Eval", "Observability"],
+    "repo": null
+  },
+  {
+    "slug": "format-spec",
+    "title": "Format Spec Engine",
+    "summary": "用户规范驱动的 Word 排版与 Markdown↔Word。按你的要求执行，并用同一 Spec 验收。",
+    "status": "shipping",
+    "tags": ["docx", "Markdown", "Verifier"],
+    "repo": "https://github.com/LearntobeMyself/free-myself"
+  }
+]

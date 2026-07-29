@@ -1,0 +1,13 @@
+---
+description: Free Myself harness and product rules
+alwaysApply: true
+---
+
+# Free Myself rules
+
+- Treat `src/harness` as the execution spine for workbench features.
+- Prefer deterministic tools for apply/verify; models only for NL understanding when present.
+- After each feature: run `npm test` before committing.
+- Do not edit the plan file in `.cursor/plans`.
+- Document formatting must go through Format Spec + verifier, not opaque beautify templates.
+- Keep Chinese UI copy concise; brand name is **Free Myself**.
