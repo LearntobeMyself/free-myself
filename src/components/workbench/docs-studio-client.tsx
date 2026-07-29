@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type DragEvent } from "react";
 
 type SpecMeta = { id: string; name: string; scene: string };
+type Tab = "word" | "markdown";
 
 function base64ToObjectUrl(base64: string): string {
   const bin = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
@@ -12,6 +13,25 @@ function base64ToObjectUrl(base64: string): string {
   return URL.createObjectURL(blob);
 }
 
+function isDocx(file: File): boolean {
+  const name = file.name.toLowerCase();
+  return (
+    name.endsWith(".docx") ||
+    file.type ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  );
+}
+
+function isMarkdownFile(file: File): boolean {
+  const name = file.name.toLowerCase();
+  return (
+    name.endsWith(".md") ||
+    name.endsWith(".markdown") ||
+    name.endsWith(".txt") ||
+    file.type.startsWith("text/")
+  );
+}
+
 export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] }) {
   const [specs, setSpecs] = useState(initialSpecs);
   const [selectedId, setSelectedId] = useState(initialSpecs[0]?.id ?? "");
@@ -19,13 +39,18 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
     "标题黑体三号居中，正文宋体小四 1.5 倍行距首行缩进两字符，页边距上下 2.54 左右 3.17",
   );
   const [specName, setSpecName] = useState("我的课程报告规范");
+  const [specOpen, setSpecOpen] = useState(false);
+  const [tab, setTab] = useState<Tab>("word");
   const [docxFile, setDocxFile] = useState<File | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const [markdown, setMarkdown] = useState(
     "# 人工智能导论\n\n## 背景\n\n本节讨论大模型与文档排版。\n\n## 结论\n\n按自己的规范改格式，比套漂亮模板靠谱。",
   );
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+
+  const docxFileRef = useRef<HTMLInputElement>(null);
   const mdFileRef = useRef<HTMLInputElement>(null);
 
   async function refreshSpecs() {
@@ -52,6 +77,7 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
       await refreshSpecs();
       if (data.spec?.id) setSelectedId(data.spec.id);
       setStatus("规范已保存");
+      setSpecOpen(false);
     } finally {
       setBusy(false);
     }
@@ -73,6 +99,39 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
     } finally {
       setBusy(false);
     }
+  }
+
+  function pickDocx(file: File | null) {
+    if (!file) return;
+    if (!isDocx(file)) {
+      setStatus("请选择 .docx 文件");
+      return;
+    }
+    setDocxFile(file);
+    setStatus(`已选：${file.name}`);
+  }
+
+  async function pickMarkdown(file: File | null) {
+    if (!file) return;
+    if (!isMarkdownFile(file)) {
+      setStatus("请选择 .md / .txt 文件");
+      return;
+    }
+    const text = await file.text();
+    setMarkdown(text);
+    setStatus(`已载入 ${file.name}`);
+  }
+
+  function onDocxDrop(e: DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    pickDocx(e.dataTransfer.files?.[0] ?? null);
+  }
+
+  function onMdDrop(e: DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    void pickMarkdown(e.dataTransfer.files?.[0] ?? null);
   }
 
   async function formatWord() {
@@ -150,118 +209,233 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
     }
   }
 
-  async function onMdFile(file: File | null) {
-    if (!file) return;
-    const text = await file.text();
-    setMarkdown(text);
-    setStatus(`已载入 ${file.name}`);
-  }
-
   return (
-    <div className="fm-stack">
-      <header>
+    <div className="fm-docs-studio">
+      <header className="mb-5">
         <h1 className="fm-workbench-title">文档工坊</h1>
-        <p className="fm-workbench-lead">
-          上传 Word 或 Markdown，按你写好的规范改格式，再下载
-          .docx。排版在本机 Python 服务里跑，不上传云端。
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          选规范 → 上传稿 → 下载 Word。本机排版，不上传云端。
         </p>
       </header>
 
-      <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">1. 排版规范</h2>
-        <input
-          className="fm-input"
-          value={specName}
-          onChange={(e) => setSpecName(e.target.value)}
-          placeholder="规范名称"
-        />
-        <textarea className="fm-textarea" value={nl} onChange={(e) => setNl(e.target.value)} />
-        <div className="flex flex-wrap gap-2">
-          <button
-            className="fm-btn fm-btn-primary"
-            disabled={busy}
-            onClick={() => void saveSpecFromNl()}
-          >
-            从说明生成并保存
-          </button>
-          <button className="fm-btn" disabled={busy} onClick={() => void ensureDefault()}>
-            用默认课程报告规范
-          </button>
-        </div>
+      {/* 规范条 */}
+      <section className="fm-docs-spec-bar">
         <select
-          className="fm-select"
+          className="fm-select fm-docs-spec-select"
           value={selectedId}
           onChange={(e) => setSelectedId(e.target.value)}
+          aria-label="排版规范"
         >
-          <option value="">选择已保存的规范</option>
+          <option value="">选择规范</option>
           {specs.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}（{s.scene}）
             </option>
           ))}
         </select>
-      </section>
-
-      <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">2a. Word → 改格式 → Word</h2>
-        <p className="text-sm text-[var(--text-muted)]">
-          适合已经写好的课程报告：只动字体、行距、页边距这些，尽量不改内容。
-        </p>
-        <input
-          type="file"
-          accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          className="block w-full text-sm text-[var(--text-muted)]"
-          onChange={(e) => setDocxFile(e.target.files?.[0] ?? null)}
-        />
-        {docxFile ? (
-          <p className="text-xs text-[var(--text-faint)]">已选：{docxFile.name}</p>
-        ) : null}
         <button
-          className="fm-btn fm-btn-primary"
+          type="button"
+          className="fm-btn"
           disabled={busy}
-          onClick={() => void formatWord()}
+          onClick={() => void ensureDefault()}
         >
-          按规范改格式
+          用默认规范
+        </button>
+        <button
+          type="button"
+          className="fm-btn"
+          onClick={() => setSpecOpen((v) => !v)}
+        >
+          {specOpen ? "收起自定义" : "自定义规范"}
         </button>
       </section>
 
-      <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">2b. Markdown → Word</h2>
-        <p className="text-sm text-[var(--text-muted)]">
-          粘贴 Markdown，或上传 .md，按同一套规范生成 Word。
-        </p>
-        <input
-          ref={mdFileRef}
-          type="file"
-          accept=".md,.markdown,text/markdown,text/plain"
-          className="block w-full text-sm text-[var(--text-muted)]"
-          onChange={(e) => void onMdFile(e.target.files?.[0] ?? null)}
-        />
-        <textarea
-          className="fm-textarea min-h-48"
-          value={markdown}
-          onChange={(e) => setMarkdown(e.target.value)}
-        />
-        <button
-          className="fm-btn fm-btn-primary"
-          disabled={busy}
-          onClick={() => void convertMarkdown()}
-        >
-          转为 Word
-        </button>
-      </section>
+      {specOpen ? (
+        <section className="fm-panel-quiet space-y-3 pb-4">
+          <input
+            className="fm-input"
+            value={specName}
+            onChange={(e) => setSpecName(e.target.value)}
+            placeholder="规范名称"
+          />
+          <textarea
+            className="fm-textarea fm-docs-spec-textarea"
+            value={nl}
+            onChange={(e) => setNl(e.target.value)}
+            placeholder="用自然语言写字体、行距、页边距…"
+          />
+          <button
+            type="button"
+            className="fm-btn fm-btn-primary"
+            disabled={busy}
+            onClick={() => void saveSpecFromNl()}
+          >
+            从说明生成并保存
+          </button>
+        </section>
+      ) : null}
 
-      <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">3. 下载</h2>
+      {/* Tabs */}
+      <div className="fm-docs-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "word"}
+          className={`fm-docs-tab ${tab === "word" ? "is-active" : ""}`}
+          onClick={() => {
+            setTab("word");
+            setDragOver(false);
+          }}
+        >
+          Word 改格式
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "markdown"}
+          className={`fm-docs-tab ${tab === "markdown" ? "is-active" : ""}`}
+          onClick={() => {
+            setTab("markdown");
+            setDragOver(false);
+          }}
+        >
+          Markdown 转 Word
+        </button>
+      </div>
+
+      {tab === "word" ? (
+        <section className="space-y-3" role="tabpanel">
+          <p className="text-sm text-[var(--text-muted)]">
+            已写好的课程报告：只改字体、行距、页边距，尽量不动内容。
+          </p>
+          <input
+            ref={docxFileRef}
+            type="file"
+            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            className="sr-only"
+            tabIndex={-1}
+            onChange={(e) => {
+              pickDocx(e.target.files?.[0] ?? null);
+              e.target.value = "";
+            }}
+          />
+          <div
+            className={`fm-dropzone ${dragOver ? "is-dragover" : ""}`}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+              setDragOver(false);
+            }}
+            onDrop={onDocxDrop}
+          >
+            <p className="fm-dropzone-title">
+              {docxFile ? docxFile.name : "把 .docx 拖到这里"}
+            </p>
+            <p className="fm-dropzone-hint">或</p>
+            <button
+              type="button"
+              className="fm-btn fm-btn-primary"
+              onClick={() => docxFileRef.current?.click()}
+            >
+              选择 .docx
+            </button>
+            {docxFile ? (
+              <button
+                type="button"
+                className="fm-btn mt-2"
+                onClick={() => {
+                  setDocxFile(null);
+                  setStatus("已清除文件");
+                }}
+              >
+                清除
+              </button>
+            ) : null}
+          </div>
+          <button
+            type="button"
+            className="fm-btn fm-btn-primary"
+            disabled={busy}
+            onClick={() => void formatWord()}
+          >
+            按规范改格式
+          </button>
+        </section>
+      ) : (
+        <section className="space-y-3" role="tabpanel">
+          <p className="text-sm text-[var(--text-muted)]">
+            粘贴 Markdown，或上传 .md，按同一套规范生成 Word。
+          </p>
+          <input
+            ref={mdFileRef}
+            type="file"
+            accept=".md,.markdown,.txt,text/markdown,text/plain"
+            className="sr-only"
+            tabIndex={-1}
+            onChange={(e) => {
+              void pickMarkdown(e.target.files?.[0] ?? null);
+              e.target.value = "";
+            }}
+          />
+          <div
+            className={`fm-dropzone fm-dropzone-compact ${dragOver ? "is-dragover" : ""}`}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+              setDragOver(false);
+            }}
+            onDrop={onMdDrop}
+          >
+            <button
+              type="button"
+              className="fm-btn"
+              onClick={() => mdFileRef.current?.click()}
+            >
+              选择 .md
+            </button>
+            <span className="text-sm text-[var(--text-faint)]">或直接在下方编辑</span>
+          </div>
+          <textarea
+            className="fm-textarea fm-docs-md-textarea"
+            value={markdown}
+            onChange={(e) => setMarkdown(e.target.value)}
+          />
+          <button
+            type="button"
+            className="fm-btn fm-btn-primary"
+            disabled={busy}
+            onClick={() => void convertMarkdown()}
+          >
+            转为 Word
+          </button>
+        </section>
+      )}
+
+      {/* 结果条 */}
+      <div className="fm-docs-result">
+        <p className="fm-docs-result-status">{status || "准备好了就点上面的按钮。"}</p>
         {downloadUrl ? (
           <a className="fm-btn fm-btn-primary" href={downloadUrl} download="free-myself.docx">
             下载 Word
           </a>
-        ) : (
-          <p className="text-sm text-[var(--text-muted)]">改完或转完后，下载按钮会出现在这里。</p>
-        )}
-        <p className="text-sm text-[var(--text-faint)]">{status}</p>
-      </section>
+        ) : null}
+      </div>
     </div>
   );
 }
