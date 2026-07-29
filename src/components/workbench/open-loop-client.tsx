@@ -12,7 +12,7 @@ export function OpenLoopClient({ initialItems }: { initialItems: Commitment[] })
   const [msg, setMsg] = useState("");
 
   async function extract() {
-    setMsg("running harness…");
+    setMsg("正在抽取…");
     const res = await fetch("/api/open-loop", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -21,7 +21,7 @@ export function OpenLoopClient({ initialItems }: { initialItems: Commitment[] })
     const data = await res.json();
     setItems(data.items ?? []);
     setRunId(data.runId ?? null);
-    setMsg(res.ok ? `extracted ${data.added ?? 0}` : data.error);
+    setMsg(res.ok ? `新增 ${data.added ?? 0} 条` : data.error);
   }
 
   async function setStatus(id: string, status: Commitment["status"]) {
@@ -37,14 +37,14 @@ export function OpenLoopClient({ initialItems }: { initialItems: Commitment[] })
   return (
     <div className="fm-stack">
       <header>
-        <h1 className="fm-workbench-title">Open Loop</h1>
+        <h1 className="fm-workbench-title">未闭环</h1>
         <p className="fm-workbench-lead">
-          粘贴聊天/纪要 → 只抽「我该做的」→ 必须带原文引用。不做微信破解。
+          粘贴聊天或纪要 → 只抽「我该做的」→ 必须带原文引用。
         </p>
       </header>
 
       <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">Paste</h2>
+        <h2 className="fm-section-label">粘贴内容</h2>
         <textarea className="fm-textarea" value={text} onChange={(e) => setText(e.target.value)} />
         <button className="fm-btn fm-btn-primary" onClick={() => void extract()}>
           抽取承诺
@@ -54,7 +54,7 @@ export function OpenLoopClient({ initialItems }: { initialItems: Commitment[] })
           {runId ? (
             <>
               {" "}
-              · run{" "}
+              · 轨迹{" "}
               <a className="underline" href={`/workbench/traces/${runId}`}>
                 {runId.slice(0, 8)}
               </a>
@@ -64,15 +64,15 @@ export function OpenLoopClient({ initialItems }: { initialItems: Commitment[] })
       </section>
 
       <section className="fm-stack">
-        <h2 className="fm-section-label">Commitments</h2>
+        <h2 className="fm-section-label">我的承诺</h2>
         {items.map((item) => (
           <article key={item.id} className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg-1)] p-4 shadow-[var(--shadow-soft)]">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="font-medium">{item.text}</p>
                 <p className="mt-1 text-xs text-[var(--text-faint)]">
-                  source: 「{item.sourceSpan}」
-                  {item.due ? ` · due ${item.due}` : ""}
+                  原文：「{item.sourceSpan}」
+                  {item.due ? ` · 截止 ${item.due}` : ""}
                 </p>
               </div>
               <select
@@ -82,9 +82,9 @@ export function OpenLoopClient({ initialItems }: { initialItems: Commitment[] })
                   void setStatus(item.id, e.target.value as Commitment["status"])
                 }
               >
-                <option value="open">open</option>
-                <option value="waiting">waiting</option>
-                <option value="done">done</option>
+                <option value="open">待办</option>
+                <option value="waiting">等待中</option>
+                <option value="done">已完成</option>
               </select>
             </div>
           </article>

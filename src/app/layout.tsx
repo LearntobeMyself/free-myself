@@ -23,8 +23,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Free Myself",
-  description: "个人解放站 + Harness 练兵场 — LearntobeMyself",
+  title: "解放自己",
+  description: "个人解放站：展示真实项目，处理费时琐事 — LearntobeMyself",
 };
 
 export default function RootLayout({
@@ -41,7 +41,7 @@ export default function RootLayout({
         <SiteHeader />
         <div className="flex-1">{children}</div>
         <footer className="border-t border-[var(--border)] py-10 text-center text-sm text-[var(--text-faint)]">
-          Free Myself · Agent = Model + Harness · LearntobeMyself
+          解放自己 · 把重复劳动交出去 · LearntobeMyself
         </footer>
       </body>
     </html>

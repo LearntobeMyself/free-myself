@@ -174,11 +174,11 @@ export function formatRelativeDate(iso: string): string {
   const t = new Date(iso).getTime();
   if (Number.isNaN(t)) return iso;
   const days = Math.round((Date.now() - t) / 86_400_000);
-  if (days <= 0) return "today";
-  if (days === 1) return "1 day ago";
-  if (days < 30) return `${days} days ago`;
-  if (days < 365) return `${Math.round(days / 30)} mo ago`;
-  return `${Math.round(days / 365)} yr ago`;
+  if (days <= 0) return "今天";
+  if (days === 1) return "昨天";
+  if (days < 30) return `${days} 天前`;
+  if (days < 365) return `${Math.round(days / 30)} 个月前`;
+  return `${Math.round(days / 365)} 年前`;
 }
 
 /** Pure helpers for tests — map + filter without network */

@@ -26,7 +26,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       return (
         <main className="mx-auto max-w-3xl px-5 py-16">
           <Link href="/#projects" className="text-sm text-[var(--text-muted)]">
-            ← Projects
+            ← 返回项目
           </Link>
           <p className="mt-6 text-[var(--text-muted)]">加载失败：{error}</p>
         </main>
@@ -40,7 +40,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   return (
     <main className="mx-auto max-w-3xl px-5 py-16">
       <Link href="/#projects" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)]">
-        ← Projects
+        ← 返回项目
       </Link>
       <div className="fm-rise mt-6">
         <div className="mb-3 flex flex-wrap items-center gap-3">
@@ -52,9 +52,9 @@ export default async function ProjectDetailPage({ params }: Props) {
           {repo.description?.trim() || "暂无仓库描述"}
         </p>
         <div className="mt-4 flex flex-wrap gap-3 text-sm text-[var(--text-faint)]">
-          <span>★ {repo.stars}</span>
-          <span>更新 {formatRelativeDate(repo.pushedAt)}</span>
-          <span>分支 {repo.defaultBranch}</span>
+          <span>星标 {repo.stars}</span>
+          <span>更新于 {formatRelativeDate(repo.pushedAt)}</span>
+          <span>默认分支 {repo.defaultBranch}</span>
         </div>
         {repo.topics.length ? (
           <div className="mt-4 flex flex-wrap gap-2">
@@ -68,7 +68,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
         {repo.readmeExcerpt ? (
           <div className="fm-panel mt-10 p-6">
-            <h2 className="text-lg font-medium">README</h2>
+            <h2 className="text-lg font-medium">说明摘要</h2>
             <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-muted)]">
               {repo.readmeExcerpt}
             </p>
@@ -79,18 +79,18 @@ export default async function ProjectDetailPage({ params }: Props) {
           <div className="fm-panel mt-6 p-6">
             <h2 className="text-lg font-medium">演示预留</h2>
             <p className="mt-2 text-[var(--text-muted)]">
-              该仓库的站内深度演示尚未开发完成。此处预留给架构图、运行截图与交互入口——先链到
-              GitHub 查看源码。
+              这个仓库的站内深度演示还没做完。这里先留位给架构图、截图和交互入口——目前请先去
+              GitHub 看源码。
             </p>
           </div>
         ) : (
           <div className="fm-panel mt-6 space-y-3 p-6">
             <h2 className="text-lg font-medium">本站工作台</h2>
             <p className="text-[var(--text-muted)]">
-              Passport、Open Loop、Document Studio、Traces 都在工作台。
+              护照、未闭环、文档工坊、运行轨迹都在工作台里。
             </p>
             <Link href="/workbench" className="fm-btn fm-btn-primary inline-flex">
-              打开 Workbench
+              打开工作台
             </Link>
           </div>
         )}
@@ -111,7 +111,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               target="_blank"
               rel="noreferrer"
             >
-              Homepage
+              访问主页
             </a>
           ) : null}
         </div>

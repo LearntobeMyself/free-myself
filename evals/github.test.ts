@@ -77,6 +77,6 @@ describe("github helpers", () => {
 
   it("formats relative dates", () => {
     const today = formatRelativeDate(new Date().toISOString());
-    expect(today).toBe("today");
+    expect(today).toBe("今天");
   });
 });

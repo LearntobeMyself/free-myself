@@ -22,7 +22,7 @@ export function PassportClient({
   const [status, setStatus] = useState("");
 
   async function patch(body: Record<string, unknown>) {
-    setStatus("saving…");
+    setStatus("保存中…");
     const res = await fetch("/api/passport", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -32,20 +32,20 @@ export function PassportClient({
     setPassport(data.passport);
     setDrift(data.drift ?? []);
     if (data.export) setExportText(data.export);
-    setStatus(res.ok ? "saved" : data.error ?? "error");
+    setStatus(res.ok ? "已保存" : data.error ?? "出错了");
   }
 
   return (
     <div className="fm-stack">
       <header>
-        <h1 className="fm-workbench-title">Context Passport</h1>
+        <h1 className="fm-workbench-title">上下文护照</h1>
         <p className="fm-workbench-lead">
-          分层上下文：身份 / 偏好 / 项目护照 / 决策 / 交接。导出给 Cursor 与其他 Agent。
+          分层记下身份、偏好、项目约定、决策和交接。导出给编程助手用，少重复解释。
         </p>
       </header>
 
       <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">Identity</h2>
+        <h2 className="fm-section-label">身份</h2>
         <input
           className="fm-input"
           value={passport.identity.displayName}
@@ -75,7 +75,7 @@ export function PassportClient({
       </section>
 
       <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">Preferences</h2>
+        <h2 className="fm-section-label">偏好</h2>
         <ul className="space-y-1 text-sm text-[var(--text-muted)]">
           {passport.preferences.map((p) => (
             <li key={p}>· {p}</li>
@@ -108,7 +108,7 @@ export function PassportClient({
       </section>
 
       <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">Decision Log</h2>
+        <h2 className="fm-section-label">决策记录</h2>
         <input
           className="fm-input"
           placeholder="标题"
@@ -147,7 +147,7 @@ export function PassportClient({
       </section>
 
       <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">Session Handoff</h2>
+        <h2 className="fm-section-label">会话交接</h2>
         <textarea
           className="fm-textarea"
           placeholder="本次会话结束时写下：完成了什么、下一步、坑点"
@@ -166,22 +166,22 @@ export function PassportClient({
       </section>
 
       <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">Export & Drift</h2>
+        <h2 className="fm-section-label">导出与漂移检查</h2>
         <div className="flex flex-wrap gap-2">
           <button className="fm-btn" onClick={() => patch({ action: "export_agents" })}>
-            导出 AGENTS.md
+            导出助手说明
           </button>
           <button className="fm-btn" onClick={() => patch({ action: "export_cursor" })}>
-            导出 Cursor rules
+            导出编辑器规则
           </button>
           <button className="fm-btn" onClick={() => patch({ action: "drift" })}>
-            漂移检查
+            检查是否过时
           </button>
         </div>
         <div className="flex flex-wrap gap-2">
           {drift.map((d) => (
             <span key={d.id} className={`fm-badge ${d.ok ? "fm-badge-ok" : "fm-badge-bad"}`}>
-              {d.id}: {d.ok ? "ok" : "drift"}
+              {d.id}: {d.ok ? "正常" : "可能过时"}
             </span>
           ))}
         </div>

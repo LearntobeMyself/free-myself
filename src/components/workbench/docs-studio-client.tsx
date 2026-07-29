@@ -98,14 +98,14 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
   return (
     <div className="fm-stack">
       <header>
-        <h1 className="fm-workbench-title">Document Studio</h1>
+        <h1 className="fm-workbench-title">文档工坊</h1>
         <p className="fm-workbench-lead">
-          你的规范 → 系统执行 → 同一规范验收。不是选个漂亮模板就完事。
+          你写清要求，系统按要求改，再用同一套要求验收——不是随便套个漂亮模板。
         </p>
       </header>
 
       <section className="fm-panel-quiet space-y-3">
-        <h2 className="fm-section-label">Format Spec</h2>
+        <h2 className="fm-section-label">排版规范</h2>
         <input
           className="fm-input"
           value={specName}
@@ -138,9 +138,9 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
       <section className="fm-panel-quiet space-y-3">
         <h2 className="fm-section-label">Word 一键规范排版</h2>
         <textarea className="fm-textarea" value={plain} onChange={(e) => setPlain(e.target.value)} />
-        <button className="fm-btn fm-btn-primary" onClick={() => void formatWord()}>
-          按 Spec 排版
-        </button>
+          <button className="fm-btn fm-btn-primary" onClick={() => void formatWord()}>
+            按规范排版
+          </button>
       </section>
 
       <section className="fm-panel-quiet space-y-3">
@@ -179,7 +179,7 @@ export function DocsStudioClient({ initialSpecs }: { initialSpecs: SpecMeta[] })
         ) : null}
         {runId ? (
           <p className="text-sm text-[var(--text-muted)]">
-            harness run:{" "}
+            运行记录：{" "}
             <a className="underline" href={`/workbench/traces/${runId}`}>
               {runId}
             </a>

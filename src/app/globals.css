@@ -291,3 +291,165 @@ a {
   border-bottom: none;
   padding-bottom: 0;
 }
+
+/* —— 动效系统：炫但不吵 —— */
+.fm-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(4px);
+  transition:
+    opacity 700ms var(--ease),
+    transform 700ms var(--ease),
+    filter 700ms var(--ease);
+  will-change: opacity, transform, filter;
+}
+
+.fm-reveal.is-in {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.fm-hero-atmosphere {
+  position: relative;
+  overflow: hidden;
+  --mx: 50%;
+  --my: 35%;
+}
+
+.fm-hero-orb {
+  pointer-events: none;
+  position: absolute;
+  inset: -20% -10% auto;
+  height: 70%;
+  background:
+    radial-gradient(
+      420px 280px at var(--mx) var(--my),
+      rgba(31, 92, 87, 0.16),
+      transparent 60%
+    ),
+    radial-gradient(600px 360px at 70% 20%, rgba(90, 120, 160, 0.08), transparent 55%);
+  transition: background-position 120ms linear;
+}
+
+.fm-hero-grid {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(20, 24, 28, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 24, 28, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 55% at 50% 40%, black, transparent);
+}
+
+.fm-spotlight {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-1);
+  box-shadow: var(--shadow-soft);
+  --spot-x: 50%;
+  --spot-y: 40%;
+  transition:
+    transform 320ms var(--ease),
+    border-color 320ms var(--ease),
+    box-shadow 320ms var(--ease);
+}
+
+.fm-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    320px circle at var(--spot-x) var(--spot-y),
+    rgba(31, 92, 87, 0.12),
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 280ms var(--ease);
+  pointer-events: none;
+}
+
+.fm-spotlight:hover {
+  transform: translateY(-4px);
+  border-color: rgba(20, 24, 28, 0.16);
+  box-shadow: 0 16px 36px rgba(20, 24, 28, 0.07);
+}
+
+.fm-spotlight:hover::before {
+  opacity: 1;
+}
+
+.fm-project-card .fm-card-arrow {
+  color: var(--accent);
+}
+
+.fm-btn-press:active {
+  transform: scale(0.98);
+}
+
+.fm-scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  animation: fmFloat 2.4s var(--ease) infinite;
+}
+
+.fm-scroll-hint::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.7;
+}
+
+@keyframes fmFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 1;
+  }
+}
+
+.fm-value-card {
+  height: 100%;
+  padding: 0.25rem 0.15rem;
+}
+
+.fm-value-index {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent);
+  opacity: 0.55;
+  letter-spacing: -0.04em;
+}
+
+.fm-section-label {
+  text-transform: none;
+  letter-spacing: 0.08em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fm-reveal,
+  .fm-spotlight,
+  .fm-scroll-hint,
+  .fm-btn,
+  .fm-project-card {
+    transition: none !important;
+    animation: none !important;
+    filter: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
