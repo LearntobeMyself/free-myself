@@ -5,6 +5,12 @@ import {
   normalizeSpec,
   validateSpec,
 } from "@/lib/format-spec";
+import {
+  orderMatchRules,
+  setMatchRules,
+  startsWithRule,
+  visibleCourseReportSpec,
+} from "@/lib/style-editor";
 
 describe("format spec", () => {
   it("normalizes default course report spec", () => {
@@ -33,5 +39,19 @@ describe("format spec", () => {
         styles: [{ role: "body", fontSizePt: -1 }],
       }),
     ).toThrow();
+  });
+
+  it("orders custom match rules before presets", () => {
+    const custom = startsWithRule("heading1", "附录")!;
+    const ordered = orderMatchRules([
+      ...visibleCourseReportSpec().matchRules,
+      custom,
+    ]);
+    expect(ordered[0]).toEqual(custom);
+    const next = setMatchRules(visibleCourseReportSpec(), [
+      ...visibleCourseReportSpec().matchRules,
+      custom,
+    ]);
+    expect(next.matchRules[0].pattern).toBe(custom.pattern);
   });
 });

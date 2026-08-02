@@ -8,7 +8,7 @@ from docx import Document
 from docx.oxml.ns import qn
 from docx.shared import Pt, RGBColor
 
-from formatter import format_existing_docx, guess_role, markdown_to_docx
+from formatter import format_existing_docx, guess_role, markdown_to_docx, prioritize_match_rules
 
 LOUD_SPEC = {
     "meta": {
@@ -127,6 +127,18 @@ def test_match_rules_heading1():
     p = doc.add_paragraph("第一章 背景")
     role = guess_role(p, p.text, 1, LOUD_SPEC["matchRules"])
     assert role == "heading1"
+
+
+def test_custom_match_rule_beats_preset():
+    """Custom pattern listed after presets still wins once prioritized."""
+    doc = Document()
+    p = doc.add_paragraph("第一章 特殊处理")
+    rules = [
+        {"role": "heading1", "pattern": r"^第.+[章节部]"},
+        {"role": "heading2", "pattern": r"^第一章"},  # custom override
+    ]
+    assert prioritize_match_rules(rules)[0]["role"] == "heading2"
+    assert guess_role(p, p.text, 1, rules) == "heading2"
 
 
 def test_md_to_docx_loud_body():

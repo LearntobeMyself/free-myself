@@ -8,6 +8,7 @@ import {
   FONT_EAST,
   ROLE_LABELS,
   cssFromStyle,
+  isCustomMatchRule,
   isPresetEnabled,
   getPresetRole,
   patchMargins,
@@ -110,11 +111,9 @@ export function DocsStudioClient(_props: {
       return;
     }
     setSpec((s) => {
-      const exists = s.matchRules.some(
-        (r) => r.pattern === rule.pattern && r.role === rule.role,
-      );
-      if (exists) return s;
-      return setMatchRules(s, [...s.matchRules, rule]);
+      const without = s.matchRules.filter((r) => r.pattern !== rule.pattern);
+      // Prepend so custom rules beat overlapping presets
+      return setMatchRules(s, [rule, ...without]);
     });
     setStatus(
       `已添加：以「${customStart.trim()}」开头 → ${ROLE_LABELS[customRole] ?? customRole}`,
@@ -593,8 +592,8 @@ export function DocsStudioClient(_props: {
             ) : (
               <p className="text-xs text-[var(--text-faint)]">
                 已勾选 {MATCH_PRESETS.filter((p) => isPresetEnabled(spec, p.id)).length} 种常用格式
-                {spec.matchRules.length > MATCH_PRESETS.length
-                  ? `，另有 ${spec.matchRules.length - MATCH_PRESETS.length} 条自定义`
+                {spec.matchRules.filter(isCustomMatchRule).length
+                  ? `，另有 ${spec.matchRules.filter(isCustomMatchRule).length} 条自定义`
                   : ""}
                 。
               </p>

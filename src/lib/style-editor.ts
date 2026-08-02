@@ -92,8 +92,21 @@ export function patchTable(spec: FormatSpec, patch: Partial<TableSpec>): FormatS
   return { ...spec, table: { ...spec.table, ...patch } };
 }
 
+const PRESET_PATTERNS = new Set(MATCH_PRESETS.map((p) => p.pattern));
+
+export function isCustomMatchRule(rule: MatchRule): boolean {
+  return !PRESET_PATTERNS.has(rule.pattern);
+}
+
+/** Custom starts-with rules win over presets when patterns overlap. */
+export function orderMatchRules(rules: MatchRule[]): MatchRule[] {
+  const custom = rules.filter(isCustomMatchRule);
+  const presets = rules.filter((r) => !isCustomMatchRule(r));
+  return [...custom, ...presets];
+}
+
 export function setMatchRules(spec: FormatSpec, rules: MatchRule[]): FormatSpec {
-  return { ...spec, matchRules: rules };
+  return { ...spec, matchRules: orderMatchRules(rules) };
 }
 
 /** Toggle a preset on/off in matchRules (by underlying pattern). */
@@ -102,9 +115,14 @@ export function toggleMatchPreset(spec: FormatSpec, presetId: string, on: boolea
   if (!preset) return spec;
   const without = spec.matchRules.filter((r) => r.pattern !== preset.pattern);
   if (!on) return setMatchRules(spec, without);
+  const existingRole = spec.matchRules.find((r) => r.pattern === preset.pattern)?.role;
   return setMatchRules(spec, [
     ...without,
-    { role: preset.role, pattern: preset.pattern, flags: "i" },
+    {
+      role: existingRole ?? preset.role,
+      pattern: preset.pattern,
+      flags: "i",
+    },
   ]);
 }
 

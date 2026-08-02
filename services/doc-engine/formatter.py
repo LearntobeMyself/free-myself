@@ -46,6 +46,15 @@ DEFAULT_MATCH_RULES: list[dict[str, str]] = [
     {"role": "bibliography", "pattern": r"^参考文献"},
 ]
 
+_PRESET_PATTERNS = {r["pattern"] for r in DEFAULT_MATCH_RULES}
+
+
+def prioritize_match_rules(rules: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Custom patterns first so they beat overlapping presets."""
+    custom = [r for r in rules if (r.get("pattern") or "") not in _PRESET_PATTERNS]
+    presets = [r for r in rules if (r.get("pattern") or "") in _PRESET_PATTERNS]
+    return custom + presets
+
 ALIGN_MAP = {
     "left": WD_ALIGN_PARAGRAPH.LEFT,
     "center": WD_ALIGN_PARAGRAPH.CENTER,
@@ -120,6 +129,7 @@ def guess_role(
         return "body"
 
     rules = match_rules if match_rules is not None else DEFAULT_MATCH_RULES
+    rules = prioritize_match_rules(list(rules))
     for rule in rules:
         role = rule.get("role")
         pattern = rule.get("pattern") or ""
@@ -450,6 +460,7 @@ def format_existing_docx(
     match_rules = spec.get("matchRules")
     if not match_rules:
         match_rules = DEFAULT_MATCH_RULES
+    match_rules = prioritize_match_rules(list(match_rules))
 
     role_counts: dict[str, int] = {}
     applied = 0
