@@ -25,6 +25,7 @@ STYLE_CATALOG: dict[str, Any] = {
         "heading4",
         "body",
         "bibliography",
+        "caption",
     ],
     "fontEastAsia": ["黑体", "宋体", "楷体", "仿宋", "微软雅黑"],
     "fontAscii": ["Times New Roman", "Arial", "Calibri"],
@@ -44,6 +45,9 @@ DEFAULT_MATCH_RULES: list[dict[str, str]] = [
     {"role": "heading3", "pattern": r"^\d+\.\d+(?!\.\d)"},
     {"role": "heading3", "pattern": r"^[（(][一二三四五六七八九十\d]+[）)]"},
     {"role": "bibliography", "pattern": r"^参考文献"},
+    {"role": "bibliography", "pattern": r"^\[\d+\]"},
+    {"role": "caption", "pattern": r"^图\s*\d+"},
+    {"role": "caption", "pattern": r"^表\s*\d+"},
 ]
 
 _PRESET_PATTERNS = {r["pattern"] for r in DEFAULT_MATCH_RULES}
@@ -150,6 +154,10 @@ def guess_role(
         return "heading2"
     if stripped.startswith("参考文献") or stripped.lower().startswith("reference"):
         return "bibliography"
+    if re.match(r"^\[\d+\]", stripped):
+        return "bibliography"
+    if re.match(r"^[图表]\s*\d+", stripped):
+        return "caption"
     if stripped.startswith(">") or stripped.startswith("「"):
         return "quote"
     return "body"

@@ -112,10 +112,31 @@ export const MATCH_PRESETS: MatchPreset[] = [
   },
   {
     id: "refs",
-    label: "参考文献",
+    label: "参考文献标题",
     hint: "以「参考文献」开头的段落",
     role: "bibliography",
     pattern: "^参考文献",
+  },
+  {
+    id: "ref-entry",
+    label: "[1] 文献条目",
+    hint: "例：[1] 张三. 论文题名…",
+    role: "bibliography",
+    pattern: "^\\[\\d+\\]",
+  },
+  {
+    id: "fig-cap",
+    label: "图题",
+    hint: "例：图1 系统架构",
+    role: "caption",
+    pattern: "^图\\s*\\d+",
+  },
+  {
+    id: "table-cap",
+    label: "表题",
+    hint: "例：表2 实验结果",
+    role: "caption",
+    pattern: "^表\\s*\\d+",
   },
 ];
 

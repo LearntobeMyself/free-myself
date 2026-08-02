@@ -129,6 +129,13 @@ def test_match_rules_heading1():
     assert role == "heading1"
 
 
+def test_guess_ref_entry_and_captions():
+    doc = Document()
+    assert guess_role(doc.add_paragraph("[1] 张三. 题名."), "[1] 张三. 题名.", 3) == "bibliography"
+    assert guess_role(doc.add_paragraph("图1 架构"), "图1 架构", 4) == "caption"
+    assert guess_role(doc.add_paragraph("表 2 结果"), "表 2 结果", 5) == "caption"
+
+
 def test_custom_match_rule_beats_preset():
     """Custom pattern listed after presets still wins once prioritized."""
     doc = Document()

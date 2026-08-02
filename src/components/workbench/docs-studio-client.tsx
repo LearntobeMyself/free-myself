@@ -60,6 +60,7 @@ const RULE_ROLES: StyleRole[] = [
   "heading4",
   "body",
   "bibliography",
+  "caption",
 ];
 
 export function DocsStudioClient(_props: {

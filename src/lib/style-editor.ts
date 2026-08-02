@@ -27,6 +27,7 @@ export const ROLE_LABELS: Record<string, string> = {
   heading4: "四级 H4",
   body: "正文",
   bibliography: "参考文献",
+  caption: "图/表题",
 };
 
 export const FONT_EAST = ["黑体", "宋体", "楷体", "仿宋", "微软雅黑"] as const;
