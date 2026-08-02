@@ -1,22 +1,14 @@
 import { NextResponse } from "next/server";
-import { normalizeSpec, type FormatSpec } from "@/lib/format-spec";
+import type { FormatSpec } from "@/lib/format-spec";
 import {
   DocEngineError,
   bytesToBase64,
   formatDocxWithEngine,
 } from "@/lib/doc-engine-client";
+import { parseSpecJson, resolveFormatSpec } from "@/lib/resolve-format-spec";
 import { loadSpecById } from "@/lib/spec-store";
 
 export const runtime = "nodejs";
-
-async function resolveSpec(body: {
-  specId?: string;
-  spec?: FormatSpec;
-}): Promise<FormatSpec | null> {
-  if (body.spec) return normalizeSpec(body.spec);
-  if (body.specId) return loadSpecById(body.specId);
-  return null;
-}
 
 export async function POST(req: Request) {
   const contentType = req.headers.get("content-type") || "";
@@ -31,7 +23,14 @@ export async function POST(req: Request) {
       const specId = String(form.get("specId") ?? "");
       const specRaw = form.get("spec");
       if (typeof specRaw === "string" && specRaw.trim()) {
-        spec = normalizeSpec(JSON.parse(specRaw));
+        const resolved = parseSpecJson(specRaw);
+        if (!resolved.ok) {
+          return NextResponse.json(
+            { error: resolved.error },
+            { status: resolved.status },
+          );
+        }
+        spec = resolved.spec;
       } else if (specId) {
         spec = await loadSpecById(specId);
       }
@@ -39,12 +38,28 @@ export async function POST(req: Request) {
         docxBytes = await file.arrayBuffer();
       }
     } else {
-      const body = (await req.json()) as {
+      let body: {
         specId?: string;
         spec?: FormatSpec;
         docxBase64?: string;
       };
-      spec = await resolveSpec(body);
+      try {
+        body = (await req.json()) as typeof body;
+      } catch {
+        return NextResponse.json({ error: "请求 JSON 无效" }, { status: 400 });
+      }
+      if (body.spec) {
+        const resolved = resolveFormatSpec(body.spec);
+        if (!resolved.ok) {
+          return NextResponse.json(
+            { error: resolved.error },
+            { status: resolved.status },
+          );
+        }
+        spec = resolved.spec;
+      } else if (body.specId) {
+        spec = await loadSpecById(body.specId);
+      }
       if (body.docxBase64) {
         const buf = Buffer.from(body.docxBase64, "base64");
         docxBytes = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);

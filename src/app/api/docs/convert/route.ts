@@ -1,22 +1,28 @@
 import { NextResponse } from "next/server";
-import { normalizeSpec, type FormatSpec } from "@/lib/format-spec";
+import type { FormatSpec } from "@/lib/format-spec";
 import {
   DocEngineError,
   bytesToBase64,
   markdownToDocxWithEngine,
 } from "@/lib/doc-engine-client";
+import { resolveFormatSpec } from "@/lib/resolve-format-spec";
 import { loadSpecById } from "@/lib/spec-store";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as {
+    let body: {
       direction?: string;
       specId?: string;
       spec?: FormatSpec;
       markdown?: string;
     };
+    try {
+      body = (await req.json()) as typeof body;
+    } catch {
+      return NextResponse.json({ error: "请求 JSON 无效" }, { status: 400 });
+    }
 
     if (body.direction && body.direction !== "md_to_docx") {
       return NextResponse.json(
@@ -25,8 +31,19 @@ export async function POST(req: Request) {
       );
     }
 
-    let spec: FormatSpec | null = body.spec ? normalizeSpec(body.spec) : null;
-    if (!spec && body.specId) spec = await loadSpecById(body.specId);
+    let spec: FormatSpec | null = null;
+    if (body.spec) {
+      const resolved = resolveFormatSpec(body.spec);
+      if (!resolved.ok) {
+        return NextResponse.json(
+          { error: resolved.error },
+          { status: resolved.status },
+        );
+      }
+      spec = resolved.spec;
+    } else if (body.specId) {
+      spec = await loadSpecById(body.specId);
+    }
     if (!spec) {
       return NextResponse.json({ error: "请先选择或创建排版规范" }, { status: 400 });
     }

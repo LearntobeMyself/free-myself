@@ -11,6 +11,7 @@ import {
   startsWithRule,
   visibleCourseReportSpec,
 } from "@/lib/style-editor";
+import { parseSpecJson, resolveFormatSpec } from "@/lib/resolve-format-spec";
 
 describe("format spec", () => {
   it("normalizes default course report spec", () => {
@@ -53,5 +54,12 @@ describe("format spec", () => {
       custom,
     ]);
     expect(next.matchRules[0].pattern).toBe(custom.pattern);
+  });
+
+  it("rejects invalid format-spec JSON with 400-shaped errors", () => {
+    expect(parseSpecJson("{not json").ok).toBe(false);
+    expect(resolveFormatSpec({ meta: { name: "x" }, styles: [] }).ok).toBe(false);
+    const good = resolveFormatSpec(visibleCourseReportSpec());
+    expect(good.ok).toBe(true);
   });
 });
