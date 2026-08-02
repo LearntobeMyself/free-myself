@@ -6,6 +6,7 @@ import {
   validateSpec,
 } from "@/lib/format-spec";
 import {
+  EDIT_ROLES,
   orderMatchRules,
   setMatchRules,
   startsWithRule,
@@ -61,5 +62,12 @@ describe("format spec", () => {
     expect(resolveFormatSpec({ meta: { name: "x" }, styles: [] }).ok).toBe(false);
     const good = resolveFormatSpec(visibleCourseReportSpec());
     expect(good.ok).toBe(true);
+  });
+
+  it("exposes bibliography and caption in the style editor roles", () => {
+    expect(EDIT_ROLES).toContain("bibliography");
+    expect(EDIT_ROLES).toContain("caption");
+    const bib = visibleCourseReportSpec().styles.find((s) => s.role === "bibliography");
+    expect(bib?.hangingIndentChars).toBeGreaterThan(0);
   });
 });

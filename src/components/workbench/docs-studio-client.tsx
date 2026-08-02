@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type DragEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import {
   COLOR_PRESETS,
   EDIT_ROLES,
@@ -82,9 +82,40 @@ export function DocsStudioClient(_props: {
   );
   const [busy, setBusy] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [engineHealth, setEngineHealth] = useState<{
+    ok: boolean;
+    message: string;
+  } | null>(null);
 
   const docxFileRef = useRef<HTMLInputElement>(null);
   const mdFileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function check() {
+      try {
+        const res = await fetch("/api/docs/health", { cache: "no-store" });
+        const data = (await res.json()) as { ok?: boolean; message?: string };
+        if (!cancelled) {
+          setEngineHealth({
+            ok: Boolean(data.ok),
+            message: data.message ?? (data.ok ? "排版服务就绪" : "排版服务不可用"),
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          setEngineHealth({
+            ok: false,
+            message: "无法检查排版服务状态",
+          });
+        }
+      }
+    }
+    void check();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const current = useMemo(() => styleOf(spec, activeRole), [spec, activeRole]);
   const titleCss = useMemo(() => cssFromStyle(styleOf(spec, "title")), [spec]);
@@ -228,6 +259,21 @@ export function DocsStudioClient(_props: {
           <p className="mt-1 text-sm text-[var(--text-muted)]">
             勾选标题长什么样即可（不用正则）。任意 Word 都能上传；字色默认黑色。
           </p>
+          {engineHealth ? (
+            <p
+              className={`mt-2 text-xs ${
+                engineHealth.ok ? "text-emerald-700" : "text-amber-800"
+              }`}
+            >
+              {engineHealth.ok ? "● " : "○ "}
+              {engineHealth.message}
+              {!engineHealth.ok
+                ? " · 请在 services/doc-engine 启动 uvicorn 后再套格式"
+                : ""}
+            </p>
+          ) : (
+            <p className="mt-2 text-xs text-[var(--text-faint)]">正在检查排版服务…</p>
+          )}
         </div>
         <button
           type="button"
@@ -361,6 +407,20 @@ export function DocsStudioClient(_props: {
                 value={current.firstLineIndentChars}
                 onChange={(e) =>
                   updateCurrent({ firstLineIndentChars: Number(e.target.value) || 0 })
+                }
+              />
+            </label>
+            <label className="fm-docs-knob">
+              <span>悬挂缩进</span>
+              <input
+                className="fm-input"
+                type="number"
+                min={0}
+                max={4}
+                step={1}
+                value={current.hangingIndentChars}
+                onChange={(e) =>
+                  updateCurrent({ hangingIndentChars: Number(e.target.value) || 0 })
                 }
               />
             </label>

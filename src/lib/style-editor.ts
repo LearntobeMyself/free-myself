@@ -17,6 +17,8 @@ export const EDIT_ROLES: StyleRole[] = [
   "heading3",
   "heading4",
   "body",
+  "bibliography",
+  "caption",
 ];
 
 export const ROLE_LABELS: Record<string, string> = {

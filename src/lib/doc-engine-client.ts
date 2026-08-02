@@ -118,3 +118,24 @@ export async function markdownToDocxWithEngine(
 export function bytesToBase64(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString("base64");
 }
+
+/** Ping Python doc-engine `/health`. */
+export async function pingDocEngine(): Promise<{
+  ok: boolean;
+  message: string;
+}> {
+  const base = docEngineBaseUrl();
+  try {
+    const res = await fetch(`${base}/health`, {
+      method: "GET",
+      signal: AbortSignal.timeout(4_000),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      return { ok: false, message: `排版服务异常（HTTP ${res.status}）` };
+    }
+    return { ok: true, message: `排版服务已就绪（${base}）` };
+  } catch (e) {
+    return { ok: false, message: offlineHint(e) };
+  }
+}
