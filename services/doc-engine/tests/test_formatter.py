@@ -138,3 +138,26 @@ def test_md_to_docx_loud_body():
     texts = [p.text for p in doc.paragraphs if p.text.strip()]
     assert "人工智能导论" in texts[0]
     assert doc.paragraphs[0].runs[0].font.color.rgb == RGBColor(0, 0, 0)
+
+
+def test_format_preserves_inline_runs():
+    """Body paragraphs must keep multiple runs and inline bold."""
+    doc = Document()
+    doc.add_paragraph("报告标题")  # first para → title role
+    p = doc.add_paragraph()
+    p.add_run("普通文字")
+    bold = p.add_run("加粗片段")
+    bold.bold = True
+    p.add_run("继续普通")
+    buf = io.BytesIO()
+    doc.save(buf)
+
+    out, _ = format_existing_docx(buf.getvalue(), LOUD_SPEC)
+    result = Document(io.BytesIO(out))
+    body = next(para for para in result.paragraphs if "普通文字" in para.text)
+    assert len(body.runs) >= 3
+    assert body.text == "普通文字加粗片段继续普通"
+    bold_run = next(r for r in body.runs if r.text == "加粗片段")
+    assert bold_run.bold is True
+    assert bold_run.font.size == Pt(18)
+    assert _run_color_val(bold_run) == "000000"

@@ -181,12 +181,19 @@ def _force_run_color(run, color: str) -> None:
     rPr.append(color_el)
 
 
-def set_run_font(run, style: dict[str, Any]) -> None:
+def set_run_font(
+    run,
+    style: dict[str, Any],
+    *,
+    preserve_emphasis: bool = False,
+) -> None:
+    """Apply role fonts/size/color. Optionally keep per-run bold/italic."""
     font_ascii = style.get("fontAscii") or "Times New Roman"
     font_east = style.get("fontEastAsia") or "宋体"
     size = float(style.get("fontSizePt") or 12)
-    run.font.bold = bool(style.get("bold", False))
-    run.font.italic = bool(style.get("italic", False))
+    if not preserve_emphasis:
+        run.font.bold = bool(style.get("bold", False))
+        run.font.italic = bool(style.get("italic", False))
     _set_rfonts(run, font_ascii, font_east)
     run.font.size = Pt(size)
     rPr = run._element.get_or_add_rPr()
@@ -200,13 +207,13 @@ def set_run_font(run, style: dict[str, Any]) -> None:
     _force_run_color(run, style.get("color") or "#000000")
 
 
-def _clear_paragraph_runs(paragraph: Paragraph) -> str:
-    text = paragraph.text
-    p = paragraph._p
-    for child in list(p):
-        if child.tag == qn("w:r"):
-            p.remove(child)
-    return text
+def _run_has_drawing(run) -> bool:
+    el = run._element
+    return bool(
+        el.findall(".//" + qn("w:drawing"))
+        or el.findall(".//" + qn("w:pict"))
+        or el.findall(".//" + qn("w:object"))
+    )
 
 
 def apply_paragraph_style(
@@ -216,8 +223,7 @@ def apply_paragraph_style(
     role: str,
     doc: Document | None = None,
 ) -> None:
-    text = _clear_paragraph_runs(paragraph)
-
+    """Apply paragraph + run formatting without collapsing runs (keeps images/links)."""
     word_style_name = ROLE_TO_WORD_STYLE.get(role, "Normal")
     if doc is not None:
         try:
@@ -253,9 +259,20 @@ def apply_paragraph_style(
         pf.first_line_indent = Twips(0)
         pf.left_indent = Twips(0)
 
-    _clear_paragraph_runs(paragraph)
-    run = paragraph.add_run(text)
-    set_run_font(run, style)
+    # Headings force bold from role; body keeps inline bold/italic
+    preserve = role in ("body", "bibliography", "caption", "footer", "code")
+    runs = list(paragraph.runs)
+    if not runs:
+        text = (paragraph.text or "").strip()
+        if text:
+            run = paragraph.add_run(text)
+            set_run_font(run, style, preserve_emphasis=False)
+        return
+
+    for run in runs:
+        if _run_has_drawing(run) and not (run.text or "").strip():
+            continue  # leave image-only runs alone
+        set_run_font(run, style, preserve_emphasis=preserve)
 
 
 def _patch_style_definition(doc: Document, word_name: str, style: dict[str, Any]) -> None:
