@@ -106,9 +106,10 @@ def pattern_to_regex(pattern: str, flags: str = "") -> re.Pattern[str]:
 def guess_role(
     paragraph: Paragraph,
     text: str,
-    index: int,
+    content_index: int,
     match_rules: list[dict[str, Any]] | None = None,
 ) -> str:
+    """Guess role. ``content_index`` is 0-based among non-empty paragraphs."""
     name = (paragraph.style.name if paragraph.style else "Normal") or "Normal"
     key = name.strip().lower()
     if key in STYLE_NAME_TO_ROLE:
@@ -131,7 +132,7 @@ def guess_role(
         except re.error:
             continue
 
-    if index == 0 and len(stripped) < 80:
+    if content_index == 0 and len(stripped) < 80:
         return "title"
     if re.match(r"^第[一二三四五六七八九十百千0-9]+[章节部]", stripped):
         return "heading1"
@@ -452,11 +453,13 @@ def format_existing_docx(
 
     role_counts: dict[str, int] = {}
     applied = 0
-    for i, para in enumerate(doc.paragraphs):
+    content_index = 0
+    for para in doc.paragraphs:
         text = para.text or ""
         if not text.strip():
             continue
-        role = guess_role(para, text, i, match_rules)
+        role = guess_role(para, text, content_index, match_rules)
+        content_index += 1
         style = {**(by_role.get(role) or body_style)}
         if not style.get("color"):
             style["color"] = "#000000"

@@ -140,6 +140,22 @@ def test_md_to_docx_loud_body():
     assert doc.paragraphs[0].runs[0].font.color.rgb == RGBColor(0, 0, 0)
 
 
+def test_title_skips_leading_blank_paragraphs():
+    doc = Document()
+    doc.add_paragraph("")
+    doc.add_paragraph("   ")
+    doc.add_paragraph("真正的标题")
+    doc.add_paragraph("正文第一段")
+    buf = io.BytesIO()
+    doc.save(buf)
+
+    out, summary = format_existing_docx(buf.getvalue(), LOUD_SPEC)
+    assert summary["rolesUsed"].get("title", 0) == 1
+    result = Document(io.BytesIO(out))
+    title = next(p for p in result.paragraphs if p.text.strip() == "真正的标题")
+    assert title.runs[0].font.size == Pt(22)
+
+
 def test_format_preserves_inline_runs():
     """Body paragraphs must keep multiple runs and inline bold."""
     doc = Document()
