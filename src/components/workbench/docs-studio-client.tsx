@@ -21,6 +21,7 @@ import {
   toggleMatchPreset,
   visibleCourseReportSpec,
 } from "@/lib/style-editor";
+import { withCharacterAct } from "@/components/live2d/with-character-act";
 import { MATCH_PRESETS, type FormatSpec, type StyleRole } from "@/lib/format-spec";
 
 type Tab = "word" | "markdown";
@@ -715,6 +716,7 @@ export function DocsStudioClient(_props: {
                 type="button"
                 className="fm-btn fm-btn-primary w-full"
                 disabled={busy}
+                onPointerDown={withCharacterAct("celebrate")}
                 onClick={() => void formatWord()}
               >
                 应用并下载
@@ -745,6 +747,7 @@ export function DocsStudioClient(_props: {
                 type="button"
                 className="fm-btn fm-btn-primary w-full"
                 disabled={busy}
+                onPointerDown={withCharacterAct("celebrate")}
                 onClick={() => void convertMarkdown()}
               >
                 转为 Word 并下载
@@ -755,7 +758,12 @@ export function DocsStudioClient(_props: {
           <div className="fm-docs-result">
             <p className="fm-docs-result-status">{status}</p>
             {downloadUrl ? (
-              <a className="fm-btn fm-btn-primary" href={downloadUrl} download="free-myself.docx">
+              <a
+                className="fm-btn fm-btn-primary"
+                href={downloadUrl}
+                download="free-myself.docx"
+                onPointerDown={withCharacterAct("celebrate")}
+              >
                 下载 Word
               </a>
             ) : null}

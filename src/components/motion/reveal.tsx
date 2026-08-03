@@ -128,6 +128,7 @@ export function HeroAtmosphere({ children }: { children: ReactNode }) {
     <div ref={ref} className="fm-hero-atmosphere">
       <div className="fm-hero-orb" aria-hidden />
       <div className="fm-hero-grid" aria-hidden />
+      <div className="fm-hero-sheen" aria-hidden />
       {children}
     </div>
   );

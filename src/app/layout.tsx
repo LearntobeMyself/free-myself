@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Manrope, JetBrains_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/layout/nav";
+import { CharacterDockLazy } from "@/components/live2d/character-dock-lazy";
 import "./globals.css";
 
 const display = Instrument_Serif({
@@ -43,6 +44,7 @@ export default function RootLayout({
         <footer className="border-t border-[var(--border)] py-10 text-center text-sm text-[var(--text-faint)]">
           Free myself · 本机改稿，少为格式折腾 · LearntobeMyself
         </footer>
+        <CharacterDockLazy />
       </body>
     </html>
   );
