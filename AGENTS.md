@@ -16,7 +16,8 @@ This repository is both a product and a **Harness Engineering** training ground.
 - `src/lib/format-spec.ts` — Format Spec schema (shared with Python)
 - `src/lib/github.ts` — live GitHub repos for LearntobeMyself
 - `src/harness/` — mini agent loop (smoke + ingest_spec)
-- `src/app/workbench/docs` — Document Studio (only workbench product surface)
+- `src/app/workbench/docs` — Document Studio (Word / MD 排版)
+- `src/app/workbench/ppt` — PPT Studio (Markdown 大纲 → 可编辑 .pptx)
 - `evals/` — Vitest regressions
 
 ## Commands
@@ -29,12 +30,14 @@ This repository is both a product and a **Harness Engineering** training ground.
 
 ## Release cadence (mandatory)
 
-One feature slice = one commit = one push.
+One feature slice = one commit = one push to GitHub.
+
+**Standing order:** after a feature slice is done and tests are green, the agent **must** commit and `git push` immediately. Do **not** wait for the user to remind you to upload. Do **not** leave finished work only on the local machine. See also `src/harness/README.md`.
 
 1. Implement only that slice
-2. `npm test` green (and `npm run build` when UI/routes change)
-3. Commit with a focused message (`feat:` / `style:` / `perf:` / `docs:`)
-4. `git push origin main`
+2. `npm test` green (and `npm run typecheck` / `npm run build` when UI/routes change)
+3. Commit with a focused message (`feat:` / `fix:` / `style:` / `perf:` / `docs:`)
+4. `git push origin HEAD` (usually `main`) before starting the next slice
 
 Do **not** batch unrelated features into one mega-commit.
 
@@ -61,8 +64,8 @@ Do **not** batch unrelated features into one mega-commit.
 
 ## Preferences / constraints
 
-- Workbench product focus: Document Studio only (upload Word/MD → FormatSpec → download).
-- Document formatting is Python-first; do not reintroduce Node `docx` as the main path.
+- Workbench product focus: Document Studio + PPT Studio (no commodity PDF/OCR clones).
+- Document / PPT formatting is Python-first (`python-docx` / `python-pptx`); do not reintroduce Node generators as the main path.
 - Do not ship untested feature points.
 - Do not build commodity PDF merge / image compress / generic OCR clones.
 - Prefer local `data/` for personal content.
