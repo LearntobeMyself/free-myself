@@ -27,6 +27,19 @@ export type EngineDocResult = {
   summary?: FormatSummary;
 };
 
+export type PptSummary = {
+  slideCount?: number;
+  themeId?: string;
+  kinds?: Record<string, number>;
+  titleFont?: string;
+  bodyFont?: string;
+};
+
+export type EnginePptResult = {
+  bytes: Uint8Array;
+  summary?: PptSummary;
+};
+
 async function readErrorMessage(res: Response): Promise<string> {
   try {
     const data = (await res.json()) as { detail?: string | { msg?: string }[]; error?: string };
@@ -113,6 +126,41 @@ export async function markdownToDocxWithEngine(
     throw new DocEngineError(await readErrorMessage(res), res.status >= 500 ? 502 : 400);
   }
   return parseEngineJson(res);
+}
+
+async function parsePptEngineJson(res: Response): Promise<EnginePptResult> {
+  const data = (await res.json()) as {
+    pptxBase64?: string;
+    summary?: PptSummary;
+    detail?: string;
+  };
+  if (!data.pptxBase64) {
+    throw new DocEngineError(data.detail ?? "排版服务未返回 PPT 文件", 502);
+  }
+  return { bytes: b64ToBytes(data.pptxBase64), summary: data.summary };
+}
+
+/** Markdown + DeckSpec → .pptx bytes */
+export async function markdownToPptxWithEngine(
+  markdown: string,
+  spec: unknown,
+): Promise<EnginePptResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${docEngineBaseUrl()}/v1/md-to-pptx`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ markdown, spec }),
+      signal: AbortSignal.timeout(60_000),
+    });
+  } catch (e) {
+    throw new DocEngineError(offlineHint(e), 503);
+  }
+
+  if (!res.ok) {
+    throw new DocEngineError(await readErrorMessage(res), res.status >= 500 ? 502 : 400);
+  }
+  return parsePptEngineJson(res);
 }
 
 export function bytesToBase64(bytes: Uint8Array): string {

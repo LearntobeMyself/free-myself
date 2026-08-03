@@ -1,6 +1,6 @@
 # Free myself · Python 排版引擎
 
-本机服务：按 FormatSpec 改已有 Word，或把 Markdown 转成 Word。
+本机服务：按 FormatSpec 改已有 Word / Markdown→Word，以及 Markdown 大纲→可编辑 PPTX。
 
 ## 启动
 
@@ -27,6 +27,8 @@ Next.js 通过环境变量 `DOC_ENGINE_URL`（默认 `http://127.0.0.1:8765`）�
 
 - `POST /v1/format-docx` — multipart：`file`（.docx）+ `spec`（JSON 字符串）
 - `POST /v1/md-to-docx` — JSON：`{ "markdown": "...", "spec": { ... } }`
+- `GET /v1/ppt-themes` — 内置 PPT 主题列表
+- `POST /v1/md-to-pptx` — JSON：`{ "markdown": "...", "spec": { "themeId": "business-light" } }`
 
 ## 测试
 

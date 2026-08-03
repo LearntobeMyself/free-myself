@@ -14,13 +14,19 @@ from formatter import (
     format_existing_docx,
     markdown_to_docx,
 )
+from ppt_engine import markdown_to_pptx, theme_catalog
 
-app = FastAPI(title="Free myself doc-engine", version="0.2.0")
+app = FastAPI(title="Free myself doc-engine", version="0.3.0")
 
 
 class MdToDocxBody(BaseModel):
     markdown: str = Field(min_length=1)
     spec: dict[str, Any]
+
+
+class MdToPptxBody(BaseModel):
+    markdown: str = Field(min_length=1)
+    spec: dict[str, Any] = Field(default_factory=dict)
 
 
 @app.get("/health")
@@ -73,6 +79,26 @@ async def md_to_docx(body: MdToDocxBody) -> dict[str, Any]:
     return {
         "ok": True,
         "docxBase64": bytes_to_b64(out),
+        "byteLength": len(out),
+        "summary": summary,
+    }
+
+
+@app.get("/v1/ppt-themes")
+def ppt_themes() -> dict[str, Any]:
+    return theme_catalog()
+
+
+@app.post("/v1/md-to-pptx")
+async def md_to_pptx(body: MdToPptxBody) -> dict[str, Any]:
+    try:
+        out, summary = markdown_to_pptx(body.markdown, body.spec)
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"pptx convert failed: {e}") from e
+
+    return {
+        "ok": True,
+        "pptxBase64": bytes_to_b64(out),
         "byteLength": len(out),
         "summary": summary,
     }
