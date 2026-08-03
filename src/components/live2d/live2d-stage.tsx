@@ -132,11 +132,13 @@ export function Live2DStage({
   const onErrorRef = useRef(onError);
   const outfitRef = useRef(outfit);
 
-  reducedRef.current = reducedMotion;
-  pausedRef.current = paused;
-  onReadyRef.current = onReady;
-  onErrorRef.current = onError;
-  outfitRef.current = outfit;
+  useEffect(() => {
+    reducedRef.current = reducedMotion;
+    pausedRef.current = paused;
+    onReadyRef.current = onReady;
+    onErrorRef.current = onError;
+    outfitRef.current = outfit;
+  }, [reducedMotion, paused, onReady, onError, outfit]);
 
   const showModel = (model: Live2DModelInstance) => {
     const app = appRef.current;
@@ -224,6 +226,10 @@ export function Live2DStage({
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
+
+    const unlockHands = unlockHandsRef.current;
+    const cache = cacheRef.current;
+    const inflight = inflightRef.current;
 
     disposedRef.current = false;
     let detachResize: (() => void) | undefined;
@@ -317,24 +323,24 @@ export function Live2DStage({
       loadTokenRef.current += 1;
       canvasRef.current = null;
 
-      for (const unlock of unlockHandsRef.current.values()) {
+      for (const unlock of unlockHands.values()) {
         try {
           unlock();
         } catch {
           /* ignore */
         }
       }
-      unlockHandsRef.current.clear();
+      unlockHands.clear();
 
-      for (const model of cacheRef.current.values()) {
+      for (const model of cache.values()) {
         try {
           model.destroy();
         } catch {
           /* ignore */
         }
       }
-      cacheRef.current.clear();
-      inflightRef.current.clear();
+      cache.clear();
+      inflight.clear();
       modelRef.current = null;
 
       if (appRef.current) {

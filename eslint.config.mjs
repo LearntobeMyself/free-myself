@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendor Live2D Cubism runtime (minified, not app source)
+    "public/live2d/**",
+    "tmp-pkgs/**",
   ]),
 ]);
 

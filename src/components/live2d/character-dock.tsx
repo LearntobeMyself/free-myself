@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { Live2DStage } from "@/components/live2d/live2d-stage";
 import { playCharacter } from "@/lib/live2d/character-bus";
@@ -33,49 +33,73 @@ function readStoredCollapsed(defaultCollapsed: boolean): boolean {
   return defaultCollapsed;
 }
 
+function writeOutfit(outfit: OutfitId) {
+  try {
+    localStorage.setItem(LIVE2D_STORAGE.outfit, outfit);
+  } catch {
+    /* ignore */
+  }
+}
+
+function writeCollapsed(collapsed: boolean) {
+  try {
+    localStorage.setItem(LIVE2D_STORAGE.collapsed, collapsed ? "1" : "0");
+  } catch {
+    /* ignore */
+  }
+}
+
+function subscribeAlways() {
+  return () => {};
+}
+
+function useIsClient() {
+  return useSyncExternalStore(subscribeAlways, () => true, () => false);
+}
+
+function usePrefersReducedMotion() {
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+      mq.addEventListener("change", onStoreChange);
+      return () => mq.removeEventListener("change", onStoreChange);
+    },
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => false,
+  );
+}
+
 export function CharacterDock() {
   const pathname = usePathname() || "/";
   const onWorkbench = pathname.startsWith("/workbench");
+  const isClient = useIsClient();
+  const reducedMotion = usePrefersReducedMotion();
+
   const [ready, setReady] = useState(false);
   const [outfit, setOutfit] = useState<OutfitId>("clothes1");
-  const [collapsed, setCollapsed] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
+  const [collapsed, setCollapsed] = useState(onWorkbench);
+  const [prefsReady, setPrefsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [reducedMotion, setReducedMotion] = useState(false);
   const [seenOutfits, setSeenOutfits] = useState<Set<OutfitId>>(
     () => new Set(),
   );
 
-  useEffect(() => {
-    const defaultCollapsed = window.location.pathname.startsWith("/workbench");
+  // Client-only preference hydrate during render (avoids setState-in-effect).
+  if (isClient && !prefsReady) {
     setOutfit(readStoredOutfit());
-    setCollapsed(readStoredCollapsed(defaultCollapsed));
-    setHydrated(true);
-
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReducedMotion(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
+    setCollapsed(readStoredCollapsed(onWorkbench));
+    setPrefsReady(true);
+  }
 
   useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(LIVE2D_STORAGE.outfit, outfit);
-    } catch {
-      /* ignore */
-    }
-  }, [outfit, hydrated]);
+    if (!prefsReady) return;
+    writeOutfit(outfit);
+  }, [outfit, prefsReady]);
 
   useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(LIVE2D_STORAGE.collapsed, collapsed ? "1" : "0");
-    } catch {
-      /* ignore */
-    }
-  }, [collapsed, hydrated]);
+    if (!prefsReady) return;
+    writeCollapsed(collapsed);
+  }, [collapsed, prefsReady]);
 
   const dockClass = [
     "fm-character-dock",
@@ -135,7 +159,7 @@ export function CharacterDock() {
         }
         aria-hidden={collapsed}
       >
-        {hydrated ? (
+        {prefsReady ? (
           <Live2DStage
             outfit={outfit}
             reducedMotion={reducedMotion}
