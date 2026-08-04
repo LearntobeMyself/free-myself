@@ -47,6 +47,13 @@ export const HARNESS_CURRICULUM: CurriculumStage[] = [
     docPath: "docs/learn/harness/README.md",
   },
   {
+    id: "month01",
+    monthLabel: "第 1 月",
+    title: "逐日计划：小白 → 落地",
+    summary: "4 周打卡：环境、最小 loop、读懂 src/harness、第一个工具。从这里开始。",
+    docPath: "docs/learn/harness/month-01-plan.md",
+  },
+  {
     id: "m0",
     monthLabel: "Month 0",
     title: "地基：LLM 与 Tool Calling",

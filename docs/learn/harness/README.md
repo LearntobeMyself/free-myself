@@ -45,9 +45,12 @@ goal → policy → tool execute → observe → verify → continue | stop
 
 假设每周 **15–20 小时**。不够就压缩阅读、保住动手与输出。
 
+**现在就开始（第一个月逐日）：** [month-01-plan.md](./month-01-plan.md) — 从小白到跑通 lab loop、摸进 `src/harness`。
+
 | 阶段 | 文档 | 核心产出 |
 |---|---|---|
 | Month 0（1–2 周） | [00-foundations.md](./00-foundations.md) | 口述「模型只提议，Harness 才执行」+ 50 行 loop |
+| 第一个月打卡 | [month-01-plan.md](./month-01-plan.md) | Day1–28：环境 → 最小 loop → 读仓 → 第一个工具 |
 | Month 1 | [01-loop-and-tools.md](./01-loop-and-tools.md) | 给本仓库加 1 个工具 + 测试 + Trace 回放 |
 | Month 2 | [02-verify-and-trace.md](./02-verify-and-trace.md) | 失败可诊断的演示轨迹 |
 | Month 3 | [03-context-and-policy.md](./03-context-and-policy.md) | 高质量 `AGENTS.md` + 可复现任务剧本 |
