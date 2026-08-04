@@ -3,7 +3,7 @@
 **时长：** 约 4 周  
 **前置：** [00-foundations.md](./00-foundations.md)
 
-**衔接：** 日历「第一个月」的第 3–4 周已在 [month-01-plan.md](./month-01-plan.md) 里启动本阶段（跑测试、读 harness、加第一个工具）。从该计划第 5 周起，按下面 W2–W4 继续。
+**衔接：** 深度日程 [week3](./month-01-week3.md) / [week4](./month-01-week4.md) 已覆盖本阶段的精读与第一个工具合入。月考通过后，用本页检查清单收尾，再进 Month 2。
 
 ---
 

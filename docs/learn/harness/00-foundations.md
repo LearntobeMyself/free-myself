@@ -3,7 +3,8 @@
 **时长：** 1–2 周（约 20–30 小时）  
 **前置：** 有一点 Java 后端即可；TypeScript / Python 会读代码就行。
 
-**第一个月逐日计划（小白 → 落地）：** 先跟 [month-01-plan.md](./month-01-plan.md) 打卡；本页是阶段目标与检查清单。
+**第一个月深度日程（小白 → 自研 Harness → 合入本仓）：**  
+先跟 [month-01-plan.md](./month-01-plan.md)，再按 [week1](./month-01-week1.md) → [week2](./month-01-week2.md) 打卡；本页是阶段目标与检查清单。
 
 ---
 
