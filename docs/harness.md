@@ -1,5 +1,7 @@
 # Harness map — Free myself
 
+**Learners:** start with the 5-month curriculum → [`docs/learn/harness/README.md`](./learn/harness/README.md) (site: `/learn/harness`).
+
 ## Product focus
 
 Workbench is **Document Studio only**: upload Word / Markdown → FormatSpec → download Word.

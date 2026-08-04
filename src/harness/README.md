@@ -5,6 +5,13 @@
 This folder is the execution spine for workbench agent loops (tools, registry, traces).
 The same cadence applies to **product work** done by coding agents on this repo.
 
+## Learning path
+
+5-month curriculum (Chinese): [`docs/learn/harness/README.md`](../../docs/learn/harness/README.md)  
+Site index: [`/learn/harness`](../app/learn/harness/page.tsx) (route `/learn/harness`)
+
+Start with Month 0 foundations, then read this folder alongside Month 1–2 labs.
+
 ## Release cadence (mandatory — do not wait for a reminder)
 
 After **each** completed feature slice:
