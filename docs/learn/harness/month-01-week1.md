@@ -8,6 +8,8 @@
 
 ## Day 1（4h）— 环境、总纲、三种请求对照
 
+**细案（按分钟执行）：** [month-01-day01.md](./month-01-day01.md) ← 今天从这里开始
+
 **今日目标：** Lab 能跑 TS；说清 HTTP API / Chat Completions / Tool Call 三层差别。
 
 ### 学（70min）

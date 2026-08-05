@@ -54,6 +54,13 @@ export const HARNESS_CURRICULUM: CurriculumStage[] = [
     docPath: "docs/learn/harness/month-01-plan.md",
   },
   {
+    id: "month01-d01",
+    monthLabel: "今天",
+    title: "Day1 细案：环境 + 三层对照",
+    summary: "按分钟执行：学总纲、搭 lab、对照表、闭卷默写。从这里开干。",
+    docPath: "docs/learn/harness/month-01-day01.md",
+  },
+  {
     id: "month01-w1",
     monthLabel: "第 1 月 · W1",
     title: "Week1：协议与首轮 Tool Call",

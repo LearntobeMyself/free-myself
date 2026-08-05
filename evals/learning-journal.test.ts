@@ -24,6 +24,7 @@ describe("learning journal hubs", () => {
   it("includes deep first-month week plans in curriculum", () => {
     const paths = HARNESS_CURRICULUM.map((s) => s.docPath);
     expect(paths).toContain("docs/learn/harness/month-01-plan.md");
+    expect(paths).toContain("docs/learn/harness/month-01-day01.md");
     expect(paths).toContain("docs/learn/harness/month-01-week1.md");
     expect(paths).toContain("docs/learn/harness/month-01-week2.md");
     expect(paths).toContain("docs/learn/harness/month-01-week3.md");
