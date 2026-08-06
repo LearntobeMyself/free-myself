@@ -37,6 +37,28 @@ export function harnessDocUrl(docPath: string): string {
   return `${HARNESS_DOCS_BLOB_BASE}/${docPath}`;
 }
 
+export function learnDocUrl(docPath: string): string {
+  return harnessDocUrl(docPath);
+}
+
+/** Job-focused NeetCode path — see docs/learn/leetcode/ */
+export const LEETCODE_CURRICULUM: CurriculumStage[] = [
+  {
+    id: "lc-overview",
+    monthLabel: "总纲",
+    title: "力扣刀刃时间表",
+    summary: "NeetCode 150 为主；每晚 1 题；按模式刷，不随机。",
+    docPath: "docs/learn/leetcode/README.md",
+  },
+  {
+    id: "lc-w1",
+    monthLabel: "Week 1",
+    title: "Arrays & Hashing 索引",
+    summary: "217 → 242 → 1 → 49 → 347 → 238 → 128。",
+    docPath: "docs/learn/leetcode/week1.md",
+  },
+];
+
 /** 5-month Harness Agent path — see docs/learn/harness/ */
 export const HARNESS_CURRICULUM: CurriculumStage[] = [
   {
@@ -179,7 +201,7 @@ export const JOURNAL_HUBS: Record<JournalHub["slug"], JournalHub> = {
     title: "力扣刷题记录",
     shortLabel: "力扣记录",
     description:
-      "刷题思路、题型归纳与复盘笔记索引。长文可发在 CSDN / 掘金，这里集中跳转与复习。",
+      "求职向 NeetCode 150 路线 + 打卡动力 + 外链复盘索引。每晚一题，刀刃时间。",
     emptyHint: "还没有收录刷题笔记。写完一篇就加进来，方便以后翻。",
     posts: [
       {

@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   HARNESS_CURRICULUM,
   JOURNAL_HUBS,
+  LEETCODE_CURRICULUM,
   getJournalHub,
   harnessDocUrl,
+  learnDocUrl,
 } from "@/lib/learning-journal";
 
 describe("learning journal hubs", () => {
@@ -29,5 +31,14 @@ describe("learning journal hubs", () => {
     expect(paths).toContain("docs/learn/harness/month-01-week2.md");
     expect(paths).toContain("docs/learn/harness/month-01-week3.md");
     expect(paths).toContain("docs/learn/harness/month-01-week4.md");
+  });
+
+  it("exposes leetcode curriculum with neetcode week1 entry", () => {
+    const paths = LEETCODE_CURRICULUM.map((s) => s.docPath);
+    expect(paths).toContain("docs/learn/leetcode/README.md");
+    expect(paths).toContain("docs/learn/leetcode/week1.md");
+    expect(learnDocUrl("docs/learn/leetcode/README.md")).toContain(
+      "docs/learn/leetcode/README.md",
+    );
   });
 });
