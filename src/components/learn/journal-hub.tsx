@@ -3,7 +3,7 @@ import {
   HARNESS_CURRICULUM,
   LEETCODE_CURRICULUM,
   PLATFORM_LABEL,
-  learnDocUrl,
+  lessonHref,
   type CurriculumStage,
   type JournalHub,
   type JournalPost,
@@ -24,30 +24,29 @@ function CurriculumList({
       <p className="fm-section-label mb-4">{label}</p>
       <p className="mb-4 text-sm leading-relaxed text-[var(--text-muted)]">{blurb}</p>
       <ol className="fm-journal-list">
-        {stages.map((stage) => (
-          <li key={stage.id}>
-            <a
-              href={learnDocUrl(stage.docPath)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="fm-journal-row block"
-            >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="text-lg text-[var(--text)]">{stage.title}</h2>
-                <span className="fm-mono text-xs text-[var(--text-faint)]">
-                  {stage.monthLabel}
-                </span>
-              </div>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
-                {stage.summary}
-              </p>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="fm-badge">课程</span>
-                <span className="text-xs text-[var(--accent)]">打开文档 →</span>
-              </div>
-            </a>
-          </li>
-        ))}
+        {stages.map((stage) => {
+          const href = lessonHref(stage.docPath);
+          if (!href) return null;
+          return (
+            <li key={stage.id}>
+              <Link href={href} className="fm-journal-row block">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h2 className="text-lg text-[var(--text)]">{stage.title}</h2>
+                  <span className="fm-mono text-xs text-[var(--text-faint)]">
+                    {stage.monthLabel}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
+                  {stage.summary}
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="fm-badge">课文</span>
+                  <span className="text-xs text-[var(--accent)]">站内阅读 →</span>
+                </div>
+              </Link>
+            </li>
+          );
+        })}
       </ol>
     </section>
   );
@@ -138,13 +137,13 @@ export function JournalHubView({ hub }: { hub: JournalHub }) {
       {hub.slug === "harness" ? (
         <CurriculumList
           label="5 个月学习路线"
-          blurb="Agent = Model + Harness。按阶段读仓库文档，在 src/harness 动手，周记发外站后收回本页索引。"
+          blurb="Agent = Model + Harness。点进课文站内阅读并勾选检查点；在 lab / src/harness 动手，周记发外站后收回本页索引。"
           stages={HARNESS_CURRICULUM}
         />
       ) : (
         <CurriculumList
           label="求职刷题路线"
-          blurb="NeetCode 150 为主清单。Week1 先吃 Arrays & Hashing；每晚一题，备注写题号后点亮打卡。"
+          blurb="NeetCode 150 为主清单。Week1 先吃 Arrays & Hashing；点进课文站内做检查点，备注写题号后点亮打卡。"
           stages={LEETCODE_CURRICULUM}
         />
       )}

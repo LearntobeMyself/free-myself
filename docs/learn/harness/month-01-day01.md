@@ -8,12 +8,12 @@
 
 ## 开场（5min）— 今天要交什么
 
-交不出下面 4 样，不算完成 Day 1：
+交不出下面 4 样，不算完成 Day 1（站内可勾选）：
 
-1. 终端打印 `lab-ok`  
-2. `D:/learn-agent-lab/notes/day-01.md`（含 ≥400 字概念段 + 必答题）  
-3. 三层对照表（每格 ≥2 句）  
-4. 三角图 v1：`Model ↔ Harness ↔ Tools`  
+- [ ] 终端打印 `lab-ok`
+- [ ] 写好 `D:/learn-agent-lab/notes/day-01.md`（含 ≥400 字概念段 + 必答题）
+- [ ] 完成三层对照表（每格 ≥2 句）
+- [ ] 画出三角图 v1：`Model ↔ Harness ↔ Tools`
 
 **今天不做：** Schema 编码、while loop、改 `src/harness`、申请一堆 API Key。
 
@@ -28,11 +28,11 @@
 1. [README.md](./README.md) — 公式、岗位、本仓对照表  
 2. [month-01-plan.md](./month-01-plan.md) — 负荷、四段式、月末门禁  
 
-**边读边写（笔记草稿区）：**
+**边读边写（笔记草稿区）— 做完再勾：**
 
-- 用自己的话抄一遍：`Agent = Model + Harness`  
-- 列出 Harness 六块：`Loop / Tools / Context / Verify / Trace / Guardrails`（先抄，后面闭卷）  
-- 一句话：本月你要在 lab 里造什么？  
+- [ ] 用自己的话抄一遍：`Agent = Model + Harness`
+- [ ] 列出 Harness 六块：`Loop / Tools / Context / Verify / Trace / Guardrails`（先抄，后面闭卷）
+- [ ] 一句话写下：本月你要在 lab 里造什么？
 
 ### A2（0:25–0:50）读地基概念表 — Java 对照
 

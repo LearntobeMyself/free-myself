@@ -5,7 +5,7 @@ import {
   LEETCODE_CURRICULUM,
   getJournalHub,
   harnessDocUrl,
-  learnDocUrl,
+  lessonHref,
 } from "@/lib/learning-journal";
 
 describe("learning journal hubs", () => {
@@ -15,9 +15,12 @@ describe("learning journal hubs", () => {
     expect(getJournalHub("leetcode").shortLabel).toContain("力扣");
   });
 
-  it("exposes harness curriculum stages with github doc urls", () => {
+  it("exposes harness curriculum stages with in-app lesson hrefs", () => {
     expect(HARNESS_CURRICULUM.length).toBeGreaterThanOrEqual(8);
     expect(HARNESS_CURRICULUM[0]?.docPath).toBe("docs/learn/harness/README.md");
+    expect(lessonHref("docs/learn/harness/README.md")).toBe(
+      "/learn/harness/overview",
+    );
     expect(harnessDocUrl("docs/learn/harness/README.md")).toContain(
       "docs/learn/harness/README.md",
     );
@@ -45,8 +48,8 @@ describe("learning journal hubs", () => {
     expect(paths).toContain("docs/learn/leetcode/week1.md");
     expect(paths).toContain("docs/learn/leetcode/week1-day01.md");
     expect(paths).toContain("docs/learn/leetcode/week1-day07.md");
-    expect(learnDocUrl("docs/learn/leetcode/README.md")).toContain(
-      "docs/learn/leetcode/README.md",
+    expect(lessonHref("docs/learn/leetcode/README.md")).toBe(
+      "/learn/leetcode/overview",
     );
   });
 });

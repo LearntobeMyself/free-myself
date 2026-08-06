@@ -29,7 +29,7 @@ export type CurriculumStage = {
   docPath: string;
 };
 
-/** GitHub blob base for curriculum markdown (public docs). */
+/** GitHub blob base — only for optional “在 GitHub 查看源文件”, not curriculum navigation. */
 export const HARNESS_DOCS_BLOB_BASE =
   "https://github.com/LearntobeMyself/free-myself/blob/main";
 
@@ -37,9 +37,12 @@ export function harnessDocUrl(docPath: string): string {
   return `${HARNESS_DOCS_BLOB_BASE}/${docPath}`;
 }
 
+/** @deprecated Prefer lessonHrefFromDocPath — curriculum must open in-app lessons. */
 export function learnDocUrl(docPath: string): string {
   return harnessDocUrl(docPath);
 }
+
+export { lessonHrefFromDocPath as lessonHref } from "@/lib/learn-lessons";
 
 /** Job-focused NeetCode path — see docs/learn/leetcode/ */
 export const LEETCODE_CURRICULUM: CurriculumStage[] = [
