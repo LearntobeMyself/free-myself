@@ -56,6 +56,8 @@ npx tsx -e "console.log('lab-ok')"
 
 ## Day 2（4h）— JSON Schema 深挖 + `validateToolArgs`
 
+**细案：** [month-01-day02.md](./month-01-day02.md)
+
 **今日目标：** 参数校验是 Harness 的活，不是模型的活；交出带 10 测的校验器。
 
 ### 学（70min）
@@ -124,6 +126,8 @@ npx vitest run
 
 ## Day 3（4h）— Building Effective Agents + 三种模式伪代码
 
+**细案：** [month-01-day03.md](./month-01-day03.md)
+
 **今日目标：** 分清 workflow 与 agent；能手写 3 种模式伪代码。
 
 ### 学（90min）
@@ -161,6 +165,8 @@ npx vitest run
 ---
 
 ## Day 4（4h）— Anatomy of Harness + 映射到本仓
+
+**细案：** [month-01-day04.md](./month-01-day04.md)
 
 **今日目标：** 外文概念能一一落到 Free Myself 文件路径。
 
@@ -205,6 +211,8 @@ npx vitest run
 
 ## Day 5（4h）— 手工构造合法 / 非法 messages
 
+**细案：** [month-01-day05.md](./month-01-day05.md)
+
 **今日目标：** 对「对话协议」过敏：非法序列能指出炸点。
 
 ### 学（60min）
@@ -241,6 +249,8 @@ npx vitest run
 
 ## Day 6（7h）— 实现单轮 Tool Calling（Fake 先，真模型后）
 
+**细案：** [month-01-day06.md](./month-01-day06.md)
+
 **今日目标：** 跑通「模型提议 → 你执行 → 再问模型」的**单轮**（还未 while 多步）。
 
 ### 学（60min）
@@ -273,6 +283,8 @@ call model → if tool_calls → validate → execute → append results → cal
 ---
 
 ## Day 7（7h）— 第三工具、并行调用概念、周验收
+
+**细案：** [month-01-day07.md](./month-01-day07.md)
 
 **今日目标：** 巩固 Week1；闭卷达标才能进 Week2。
 

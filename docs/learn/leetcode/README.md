@@ -41,7 +41,7 @@
 ## 第一个月 Week 1（Day1–7）
 
 主题：**Arrays & Hashing**（NC150 第一桶，面试出场率最高）  
-索引页：[week1.md](./week1.md)（细案文件将按 Day 陆续补齐）
+索引页：[week1.md](./week1.md) · 细案 Day1–7 已齐
 
 | Day | 细案 | 题目（LeetCode） | 模式 |
 |---|---|---|---|

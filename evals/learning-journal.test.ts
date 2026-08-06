@@ -27,6 +27,12 @@ describe("learning journal hubs", () => {
     const paths = HARNESS_CURRICULUM.map((s) => s.docPath);
     expect(paths).toContain("docs/learn/harness/month-01-plan.md");
     expect(paths).toContain("docs/learn/harness/month-01-day01.md");
+    expect(paths).toContain("docs/learn/harness/month-01-day02.md");
+    expect(paths).toContain("docs/learn/harness/month-01-day03.md");
+    expect(paths).toContain("docs/learn/harness/month-01-day04.md");
+    expect(paths).toContain("docs/learn/harness/month-01-day05.md");
+    expect(paths).toContain("docs/learn/harness/month-01-day06.md");
+    expect(paths).toContain("docs/learn/harness/month-01-day07.md");
     expect(paths).toContain("docs/learn/harness/month-01-week1.md");
     expect(paths).toContain("docs/learn/harness/month-01-week2.md");
     expect(paths).toContain("docs/learn/harness/month-01-week3.md");
@@ -37,6 +43,8 @@ describe("learning journal hubs", () => {
     const paths = LEETCODE_CURRICULUM.map((s) => s.docPath);
     expect(paths).toContain("docs/learn/leetcode/README.md");
     expect(paths).toContain("docs/learn/leetcode/week1.md");
+    expect(paths).toContain("docs/learn/leetcode/week1-day01.md");
+    expect(paths).toContain("docs/learn/leetcode/week1-day07.md");
     expect(learnDocUrl("docs/learn/leetcode/README.md")).toContain(
       "docs/learn/leetcode/README.md",
     );
