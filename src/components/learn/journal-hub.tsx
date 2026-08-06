@@ -6,6 +6,7 @@ import {
   type JournalHub,
   type JournalPost,
 } from "@/lib/learning-journal";
+import { LearnProgressPanel } from "@/components/learn/learn-progress-panel";
 
 function PostRow({ post }: { post: JournalPost }) {
   const platform = PLATFORM_LABEL[post.platform];
@@ -86,6 +87,8 @@ export function JournalHubView({ hub }: { hub: JournalHub }) {
           </Link>
         ) : null}
       </div>
+
+      <LearnProgressPanel track={hub.slug} />
 
       {hub.slug === "harness" ? (
         <section className="mt-12">

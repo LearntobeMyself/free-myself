@@ -258,6 +258,101 @@ a {
   overflow: hidden;
 }
 
+.fm-hero-learn {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+}
+
+.fm-hero-learn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(20, 28, 36, 0.12);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+  box-shadow: var(--shadow-soft);
+  transition:
+    color 180ms var(--ease),
+    background 180ms var(--ease),
+    border-color 180ms var(--ease),
+    transform 180ms var(--ease);
+}
+
+.fm-hero-learn-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(26, 95, 89, 0.28);
+  transform: translateY(-1px);
+}
+
+.fm-journal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fm-journal-row {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.55);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow-soft);
+  transition:
+    border-color 180ms var(--ease),
+    background 180ms var(--ease),
+    transform 180ms var(--ease);
+}
+
+a.fm-journal-row:hover {
+  border-color: rgba(26, 95, 89, 0.28);
+  background: rgba(255, 255, 255, 0.88);
+  transform: translateY(-1px);
+}
+
+.fm-heatmap {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 11px);
+  grid-auto-columns: 11px;
+  gap: 3px;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.fm-heatmap-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: rgba(26, 95, 89, 0.08);
+  border: 1px solid rgba(26, 95, 89, 0.06);
+}
+
+.fm-heatmap-l1 {
+  background: rgba(26, 95, 89, 0.22);
+}
+.fm-heatmap-l2 {
+  background: rgba(26, 95, 89, 0.4);
+}
+.fm-heatmap-l3 {
+  background: rgba(26, 95, 89, 0.62);
+}
+.fm-heatmap-l4 {
+  background: rgba(26, 95, 89, 0.88);
+}
+
 .fm-hero-prompt::after {
   content: "";
   position: absolute;
@@ -345,19 +440,16 @@ a {
 /* —— 动效系统：炫但不吵 —— */
 .fm-reveal {
   opacity: 0;
-  transform: translateY(28px);
-  filter: blur(4px);
+  transform: translateY(18px);
   transition:
-    opacity 700ms var(--ease),
-    transform 700ms var(--ease),
-    filter 700ms var(--ease);
-  will-change: opacity, transform, filter;
+    opacity 520ms var(--ease),
+    transform 520ms var(--ease);
+  will-change: opacity, transform;
 }
 
 .fm-reveal.is-in {
   opacity: 1;
   transform: translateY(0);
-  filter: blur(0);
 }
 
 .fm-hero-atmosphere {
