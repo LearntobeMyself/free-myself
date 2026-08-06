@@ -1,5 +1,3 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { z } from "zod";
 
 export const LearnTrackSchema = z.enum(["harness", "leetcode"]);
@@ -82,6 +80,12 @@ export function splitLessonBlocks(markdown: string): LessonBlock[] {
   return blocks;
 }
 
+function basenamePosix(file: string): string {
+  const normalized = file.replace(/\\/g, "/");
+  const parts = normalized.split("/");
+  return parts[parts.length - 1] || normalized;
+}
+
 /**
  * Rewrite relative .md links to in-app lesson routes.
  * Keeps http(s) and absolute site links untouched.
@@ -93,8 +97,7 @@ export function rewriteLearnMarkdownLinks(
   return markdown.replace(
     /\]\((?!https?:\/\/|\/|#|mailto:)([^)\s]+?\.md)(#[^)\s]*)?\)/gi,
     (_full, file: string, hash = "") => {
-      const base = path.posix.basename(file.replace(/\\/g, "/"));
-      const stem = base.replace(/\.md$/i, "");
+      const stem = basenamePosix(file).replace(/\.md$/i, "");
       const slug = stem.toLowerCase() === "readme" ? "overview" : stem;
       return `](/learn/${track}/${slug}${hash})`;
     },
@@ -104,37 +107,4 @@ export function rewriteLearnMarkdownLinks(
 export function extractLessonTitle(markdown: string, fallback: string): string {
   const m = markdown.match(/^#\s+(.+)$/m);
   return m?.[1]?.trim() || fallback;
-}
-
-export async function loadLesson(
-  track: LearnTrack,
-  slug: string,
-): Promise<LessonMeta | null> {
-  const parsed = LearnTrackSchema.safeParse(track);
-  if (!parsed.success) return null;
-  const fileName = resolveLessonFileName(slug);
-  if (!fileName) return null;
-
-  const docPath = `docs/learn/${parsed.data}/${fileName}`;
-  const root = path.resolve(process.cwd(), "docs", "learn", parsed.data);
-  const abs = path.resolve(root, fileName);
-  const rel = path.relative(root, abs);
-  if (rel.startsWith("..") || path.isAbsolute(rel)) return null;
-
-  try {
-    const raw = await readFile(abs, "utf8");
-    const markdown = rewriteLearnMarkdownLinks(raw, parsed.data);
-    const title = extractLessonTitle(raw, slug);
-    const urlSlug =
-      fileName.toLowerCase() === "readme.md" ? "overview" : slug;
-    return {
-      track: parsed.data,
-      slug: urlSlug,
-      docPath,
-      title,
-      markdown,
-    };
-  } catch {
-    return null;
-  }
 }

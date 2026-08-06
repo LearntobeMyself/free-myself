@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LessonView } from "@/components/learn/lesson-view";
-import { loadLesson } from "@/lib/learn-lessons";
+import { loadLesson } from "@/lib/learn-lessons-server";
 
 type Props = { params: Promise<{ slug: string }> };
 

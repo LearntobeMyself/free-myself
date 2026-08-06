@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   lessonHrefFromDocPath,
-  loadLesson,
   resolveLessonFileName,
   rewriteLearnMarkdownLinks,
   splitLessonBlocks,
 } from "@/lib/learn-lessons";
+import { loadLesson } from "@/lib/learn-lessons-server";
 import {
   HARNESS_CURRICULUM,
   LEETCODE_CURRICULUM,

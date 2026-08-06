@@ -43,7 +43,8 @@ For each `docs/learn/{track}/*.md` that learners open:
 
 | Piece | Path |
 |---|---|
-| Href helper + loader + block split | `src/lib/learn-lessons.ts` |
+| Href helper + block split (client-safe) | `src/lib/learn-lessons.ts` |
+| Disk loader (`loadLesson`) | `src/lib/learn-lessons-server.ts` |
 | Re-export `lessonHref` | `src/lib/learning-journal.ts` |
 | Hub list (in-app Link) | `src/components/learn/journal-hub.tsx` |
 | Lesson UI + checkpoints | `src/components/learn/lesson-view.tsx` |
