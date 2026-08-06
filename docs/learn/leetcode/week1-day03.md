@@ -24,11 +24,11 @@
 
 ## 今日目标 / 交付物
 
-交不出下面 3 样，不算完成 Day 3：
+交不出下面 3 样，不算完成 Day 3（站内可勾选）：
 
-1. **LeetCode 提交通过**（Java，返回 `int[]`）  
-2. 笔记：`D:/learn-agent-lab/notes/lc/day-03.md`  
-3. 站点打卡：备注 `1`
+- [ ] **LeetCode 提交通过**（Java，返回 `int[]`）
+- [ ] 写好笔记：`D:/learn-agent-lab/notes/lc/day-03.md`
+- [ ] 站点打卡：[/learn/leetcode](/learn/leetcode) → 备注 `1`
 
 **笔记必含：** 为何不能先排序（要原下标）；Map 里存 value 还是 index；与 217/242 的模式递进关系。
 
@@ -127,6 +127,15 @@ class Solution {
 - 桶 1 第 3 题 · **Hash Map 模式的核心样板**  
 - 后续很多题是 Two Sum 变体（三数之和、亚数组和等，在别的桶）  
 - 与 [217 Set](./week1-day01.md)、[242 计数](./week1-day02.md) 形成三部曲：存在 / 频次 / 配对
+
+---
+
+## 收工清单（全部勾完再打卡）
+
+- [ ] 能口述为何 Map 存 index 而非 value
+- [ ] Java 解法站点通过（返回下标）
+- [ ] `day-03.md` 写完
+- [ ] `/learn/leetcode` 点亮今日，备注 `1`
 
 ---
 

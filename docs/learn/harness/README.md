@@ -86,7 +86,15 @@ goal → policy → tool execute → observe → verify → continue | stop
 
 ## 怎么用本站
 
-1. 打开 [/learn/harness](/learn/harness) 看路线图  
-2. 按阶段读 `docs/learn/harness/*.md`  
-3. 在本仓库动手，Trace UI 回放  
+1. 打开 [/learn/harness](/learn/harness) 看**分层牌面**（总纲 → 月 → 周 → 日）  
+2. 点进站内课文阅读并勾检查点（不要只看 GitHub 源文件）  
+3. 在 lab / 本仓库动手，Trace UI 回放  
 4. 发周记 → 把链接加进学习页「文章索引」  
+
+---
+
+## 读完本页再继续
+
+- [ ] 能默写：`Agent = Model + Harness`
+- [ ] 知道当前主战场是第 1 月细案
+- [ ] 打开站内 [Day1 细案](/learn/harness/month-01-day01) 准备开干

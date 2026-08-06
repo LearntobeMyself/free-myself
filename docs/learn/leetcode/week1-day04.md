@@ -24,12 +24,12 @@
 
 ## 今日目标 / 交付物
 
-交不出下面 4 样，不算完成 Day 4：
+交不出下面 4 样，不算完成 Day 4（站内可勾选）：
 
-1. **LeetCode 提交通过**（Java，返回 `List<List<String>>`）  
-2. 笔记：`D:/learn-agent-lab/notes/lc/day-04.md`  
-3. 站点打卡：备注 `49`  
-4. **15min 无提示复做 [217](./week1-day01.md)**（3 天复做规则，写在笔记复盘区）
+- [ ] **LeetCode 提交通过**（Java，返回 `List<List<String>>`）
+- [ ] 写好笔记：`D:/learn-agent-lab/notes/lc/day-04.md`
+- [ ] 站点打卡：[/learn/leetcode](/learn/leetcode) → 备注 `49`
+- [ ] **15min 无提示复做 [217](./week1-day01.md)**（写在笔记复盘区）
 
 **笔记必含：** 键选「排序串」还是「#1#0#0…」；复杂度里 n、m 各指什么。
 
@@ -139,6 +139,15 @@ private String signature(String s) {
 - 桶 1 第 4 题 · 综合 [242 Valid Anagram](./week1-day02.md) 的判定，升级为「批量分组」  
 - 键的设计思想贯穿后续：Graph、Union-Find 前常需「规范化 id」  
 - 今日顺带完成 **217 三日复做**（README 卡 25 分钟规则）
+
+---
+
+## 收工清单（全部勾完再打卡）
+
+- [ ] 能口述分组键选法（排序串 vs 计数签名）
+- [ ] Java 解法站点通过
+- [ ] `day-04.md` 写完 + 217 复做记录
+- [ ] `/learn/leetcode` 点亮今日，备注 `49`
 
 ---
 

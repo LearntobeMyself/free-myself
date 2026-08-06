@@ -1388,6 +1388,136 @@ a.fm-journal-row:hover {
   }
 }
 
+/* —— Learn curriculum board (hierarchy) —— */
+.fm-curr-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+.fm-curr-section-head {
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.fm-curr-section-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.fm-curr-section-blurb {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.fm-curr-list,
+.fm-curr-children {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.fm-curr-children {
+  margin-top: 0.55rem;
+  margin-left: 0.85rem;
+  padding-left: 0.85rem;
+  border-left: 2px solid rgba(26, 95, 89, 0.16);
+  gap: 0.45rem;
+}
+
+.fm-curr-row {
+  display: block;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.55);
+  padding: 0.95rem 1.1rem;
+  box-shadow: var(--shadow-soft);
+  transition:
+    border-color 180ms var(--ease),
+    background 180ms var(--ease),
+    transform 180ms var(--ease);
+}
+
+.fm-curr-row:hover {
+  border-color: rgba(26, 95, 89, 0.28);
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.fm-curr-row.is-week {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.fm-curr-row.is-day {
+  padding: 0.75rem 0.95rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: none;
+}
+
+.fm-curr-row-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.65rem;
+}
+
+.fm-curr-kind {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(26, 95, 89, 0.08);
+  border-radius: 6px;
+  padding: 0.15rem 0.4rem;
+}
+
+.fm-curr-label {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+.fm-curr-title {
+  flex: 1 1 12rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.fm-curr-row.is-day .fm-curr-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.fm-curr-go {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.fm-curr-summary {
+  margin-top: 0.4rem;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.fm-curr-row.is-day .fm-curr-summary {
+  font-size: 0.82rem;
+}
+
 /* —— Learn lesson (in-app markdown) —— */
 .fm-lesson-hero {
   padding-bottom: 0.25rem;

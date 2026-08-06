@@ -14,3 +14,11 @@
 | 7 | [week1-day07.md](./week1-day07.md) | 128 Longest Consecutive + 复盘 |
 
 **本周门禁：** 7 题均有笔记；至少 5 题能不看题解重写；站点打卡 ≥5 天。
+
+---
+
+## 本周开干检查
+
+- [ ] 已读总纲 [overview](/learn/leetcode/overview)
+- [ ] 知道题序：217 → 242 → 1 → 49 → 347 → 238 → 128
+- [ ] 打开站内 [Day1 细案](/learn/leetcode/week1-day01) 开始做

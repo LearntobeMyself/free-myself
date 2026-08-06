@@ -22,11 +22,11 @@
 
 ## 今日目标 / 交付物
 
-交不出下面 3 样，不算完成 Day 2：
+交不出下面 3 样，不算完成 Day 2（站内可勾选）：
 
-1. **LeetCode 提交通过**（Java）  
-2. 笔记：`D:/learn-agent-lab/notes/lc/day-02.md`  
-3. 站点打卡：备注 `242`
+- [ ] **LeetCode 提交通过**（Java）
+- [ ] 写好笔记：`D:/learn-agent-lab/notes/lc/day-02.md`
+- [ ] 站点打卡：[/learn/leetcode](/learn/leetcode) → 备注 `242`
 
 **笔记必含：** 为何长度不等可直接 false；数组 vs Map 怎么选；与 217 的 Set 模式对比一句。
 
@@ -130,7 +130,16 @@ class Solution {
 
 ---
 
+## 收工清单（全部勾完再打卡）
+
+- [ ] 能口述计数法 vs 排序法取舍
+- [ ] Java 解法站点通过
+- [ ] `day-02.md` 写完（含与 217 对比一句）
+- [ ] `/learn/leetcode` 点亮今日，备注 `242`
+
+---
+
 ## 可选加餐（+10min）
 
-- 若字符集变为 Unicode，数组还合适吗？（改 HashMap）  
-- LeetCode 49 预习一句：异位词分组 = 相同频次签名
+- [ ] 若字符集变为 Unicode，数组还合适吗？（改 HashMap）
+- [ ] LeetCode 49 预习一句：异位词分组 = 相同频次签名

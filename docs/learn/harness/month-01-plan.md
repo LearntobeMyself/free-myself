@@ -140,10 +140,10 @@ npm run dev   # http://localhost:3000/learn/harness
 
 ---
 
-## 今日启动
+## 今日启动（站内可勾选）
 
-1. 读完本页  
-2. 打开 **Day 1 细案**：[month-01-day01.md](./month-01-day01.md)（或 [week1](./month-01-week1.md)）  
-3. 完成 **Day 1** 全部四段与交付物  
+- [ ] 读完本页（负荷、四段式、月末门禁）
+- [ ] 打开站内 [Day1 细案](/learn/harness/month-01-day01)（或 [Week1 索引](/learn/harness/month-01-week1)）
+- [ ] 完成 Day1 全部四段与收工清单
 
 下一枪只做 Day 2，禁止跳周。

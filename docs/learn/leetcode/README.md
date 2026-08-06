@@ -75,3 +75,11 @@
 - W4：Linked List 入门  
 
 全部仍走 NeetCode roadmap，不另起炉灶。
+
+---
+
+## 读完本页再继续
+
+- [ ] 记住每晚 1 题、Java 优先、按模式刷
+- [ ] 打开站内 [Week1 索引](/learn/leetcode/week1) 看题序
+- [ ] 从 [Day1 · 217](/learn/leetcode/week1-day01) 开干

@@ -13,6 +13,16 @@ description: >-
 
 Curriculum clicks must open **站内课文** (`/learn/{track}/{slug}`), never GitHub blob URLs. Markdown lives under `docs/learn/{track}/`; the UI renders it with Free Myself typography and **interactive checkpoints**.
 
+Hub board must show a clear hierarchy — **not** a flat mix of overview / month / week / day:
+
+1. **总纲**（overview）
+2. **月 / 阶段地图**（month）
+3. **周索引**（week）→ nested **日细案**（day）
+4. **资料**（ref，optional）
+
+Data: `HARNESS_CURRICULUM_SECTIONS` / `LEETCODE_CURRICULUM_SECTIONS` in `src/lib/learn-curriculum.ts`.  
+UI: `CurriculumBoard` in `src/components/learn/curriculum-board.tsx`.
+
 Tracks: `harness` | `leetcode`.
 
 ## Non-negotiables
@@ -46,7 +56,8 @@ For each `docs/learn/{track}/*.md` that learners open:
 | Href helper + block split (client-safe) | `src/lib/learn-lessons.ts` |
 | Disk loader (`loadLesson`) | `src/lib/learn-lessons-server.ts` |
 | Re-export `lessonHref` | `src/lib/learning-journal.ts` |
-| Hub list (in-app Link) | `src/components/learn/journal-hub.tsx` |
+| Hierarchical board data | `src/lib/learn-curriculum.ts` |
+| Hub + CurriculumBoard | `src/components/learn/journal-hub.tsx`, `curriculum-board.tsx` |
 | Lesson UI + checkpoints | `src/components/learn/lesson-view.tsx` |
 | Routes | `src/app/learn/harness/[slug]/page.tsx`, `src/app/learn/leetcode/[slug]/page.tsx` |
 | Styles | `src/app/globals.css` (`.fm-lesson*`, `.fm-checkpoint*`) |

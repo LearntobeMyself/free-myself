@@ -24,11 +24,11 @@
 
 ## 今日目标 / 交付物
 
-交不出下面 3 样，不算完成 Day 5：
+交不出下面 3 样，不算完成 Day 5（站内可勾选）：
 
-1. **LeetCode 提交通过**（Java）  
-2. 笔记：`D:/learn-agent-lab/notes/lc/day-05.md`（**必须**写清你选的解法：桶 or 堆，及为何）  
-3. 站点打卡：备注 `347`
+- [ ] **LeetCode 提交通过**（Java）
+- [ ] 写好笔记：`D:/learn-agent-lab/notes/lc/day-05.md`（写清桶 or 堆及为何）
+- [ ] 站点打卡：[/learn/leetcode](/learn/leetcode) → 备注 `347`
 
 **笔记必含：** 桶排序适用条件（频率上界 ≈ n）；与 PriorityQueue  trade-off 一张小表。
 
@@ -151,6 +151,15 @@ for (Map.Entry<Integer, Integer> e : freq.entrySet()) {
 - 桶 1 第 5 题 · 在 Hash 计数之上接 **Top K 经典套路**  
 - 与 [238 Product Except Self](./week1-day06.md) 不同：本题允许 O(n) 辅助结构，238 限制更严  
 - 堆版本与后续 Heap 桶题目衔接；桶版本强化「用值域/频率上界当数组下标」
+
+---
+
+## 收工清单（全部勾完再打卡）
+
+- [ ] 笔记写清选桶还是堆及原因
+- [ ] Java 解法站点通过
+- [ ] `day-05.md` 写完
+- [ ] `/learn/leetcode` 点亮今日，备注 `347`
 
 ---
 

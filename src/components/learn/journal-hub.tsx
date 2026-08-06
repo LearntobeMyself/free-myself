@@ -1,56 +1,13 @@
 import Link from "next/link";
 import {
-  HARNESS_CURRICULUM,
-  LEETCODE_CURRICULUM,
+  HARNESS_CURRICULUM_SECTIONS,
+  LEETCODE_CURRICULUM_SECTIONS,
   PLATFORM_LABEL,
-  lessonHref,
-  type CurriculumStage,
   type JournalHub,
   type JournalPost,
 } from "@/lib/learning-journal";
+import { CurriculumBoard } from "@/components/learn/curriculum-board";
 import { LearnProgressPanel } from "@/components/learn/learn-progress-panel";
-
-function CurriculumList({
-  label,
-  blurb,
-  stages,
-}: {
-  label: string;
-  blurb: string;
-  stages: CurriculumStage[];
-}) {
-  return (
-    <section className="mt-12">
-      <p className="fm-section-label mb-4">{label}</p>
-      <p className="mb-4 text-sm leading-relaxed text-[var(--text-muted)]">{blurb}</p>
-      <ol className="fm-journal-list">
-        {stages.map((stage) => {
-          const href = lessonHref(stage.docPath);
-          if (!href) return null;
-          return (
-            <li key={stage.id}>
-              <Link href={href} className="fm-journal-row block">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h2 className="text-lg text-[var(--text)]">{stage.title}</h2>
-                  <span className="fm-mono text-xs text-[var(--text-faint)]">
-                    {stage.monthLabel}
-                  </span>
-                </div>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
-                  {stage.summary}
-                </p>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="fm-badge">课文</span>
-                  <span className="text-xs text-[var(--accent)]">站内阅读 →</span>
-                </div>
-              </Link>
-            </li>
-          );
-        })}
-      </ol>
-    </section>
-  );
-}
 
 function PostRow({ post }: { post: JournalPost }) {
   const platform = PLATFORM_LABEL[post.platform];
@@ -135,16 +92,14 @@ export function JournalHubView({ hub }: { hub: JournalHub }) {
       <LearnProgressPanel track={hub.slug} />
 
       {hub.slug === "harness" ? (
-        <CurriculumList
-          label="5 个月学习路线"
-          blurb="Agent = Model + Harness。点进课文站内阅读并勾选检查点；在 lab / src/harness 动手，周记发外站后收回本页索引。"
-          stages={HARNESS_CURRICULUM}
+        <CurriculumBoard
+          sections={HARNESS_CURRICULUM_SECTIONS}
+          intro="顺序：总纲 → 五个月地图 → 第 1 月细案（月计划 → 周 → 日）。点进任意条目都是站内课文，可勾检查点。"
         />
       ) : (
-        <CurriculumList
-          label="求职刷题路线"
-          blurb="NeetCode 150 为主清单。Week1 先吃 Arrays & Hashing；点进课文站内做检查点，备注写题号后点亮打卡。"
-          stages={LEETCODE_CURRICULUM}
+        <CurriculumBoard
+          sections={LEETCODE_CURRICULUM_SECTIONS}
+          intro="顺序：总纲 → Week1 索引 → Day1–7。点进任意条目都是站内课文，可勾检查点；打卡备注写题号。"
         />
       )}
 

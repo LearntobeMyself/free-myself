@@ -24,13 +24,13 @@
 
 ## 今日目标 / 交付物
 
-交不出下面 5 样，不算完成 Day 7 / Week1：
+交不出下面 5 样，不算完成 Day 7 / Week1（站内可勾选）：
 
-1. **LeetCode 128 提交通过**（Java，O(n)）  
-2. 笔记：`D:/learn-agent-lab/notes/lc/day-07.md`（含**周复盘**章节）  
-3. 站点打卡：备注 `128 + W1 review`  
-4. **周复盘表**填完（见下文，7 题状态 + 5 题无提示重写）  
-5. 确认 **week1 门禁**（见 [week1.md](./week1.md)）
+- [ ] **LeetCode 128 提交通过**（Java，O(n)）
+- [ ] 写好笔记：`D:/learn-agent-lab/notes/lc/day-07.md`（含**周复盘**章节）
+- [ ] 站点打卡：[/learn/leetcode](/learn/leetcode) → 备注 `128 + W1 review`
+- [ ] **周复盘表**填完（7 题状态 + 5 题无提示重写）
+- [ ] 确认 **week1 门禁**（见 [week1.md](./week1.md)）
 
 ---
 
@@ -123,6 +123,16 @@ class Solution {
 
 - **时间 O(n)**：每个元素最多被 while 访问常数次（均摊分析）  
 - **空间 O(n)**：HashSet 存 distinct 元素
+
+---
+
+## 收工清单（Week1 总门禁）
+
+- [ ] 128 站点通过（O(n)）
+- [ ] `day-07.md` 含周复盘
+- [ ] 周复盘表 7 题状态填完
+- [ ] 至少 5 题能无提示重写
+- [ ] `/learn/leetcode` 点亮今日，备注 `128 + W1 review`
 
 ---
 
